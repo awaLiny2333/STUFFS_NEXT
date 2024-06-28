@@ -1,0 +1,212 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "Meow"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "HOME!"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "THINGS"
+    },
+    {
+      "name": "Entry_Title",
+      "value": "THINGS"
+    },
+    {
+      "name": "Entry_Subtitle",
+      "value": "Liny's NEXT app :)"
+    },
+    {
+      "name": "Greetings_Evening",
+      "value": "Good Evening \uD83C\uDF03"
+    },
+    {
+      "name": "Greetings_Morning",
+      "value": "Good Morning \uD83D\uDE3D"
+    },
+    {
+      "name": "Greetings_Sleep",
+      "value": "Time for Bed \uD83D\uDECF\uFE0F"
+    },
+    {
+      "name": "Greetings_Noon",
+      "value": "Right at Noon \uD83C\uDF5A"
+    },
+    {
+      "name": "Greetings_Afternoon",
+      "value": "Good Afternoon \uD83D\uDCD6"
+    },
+    {
+      "name": "Encouragement",
+      "value": "LIFE\nIS LIKE AN\nOCEAN\n\nONLY\nTHE STRONG-WILLED\nCAN REACH\nTHE OTHER SIDE"
+    },
+    {
+      "name": "Settings_block_Settings",
+      "value": "Settings"
+    },
+    {
+      "name": "Settings_block_Add",
+      "value": "Add"
+    },
+    {
+      "name": "Settings_Content_Background",
+      "value": "Background Style"
+    },
+    {
+      "name": "Settings_Content_Background_Color",
+      "value": "Pure Color"
+    },
+    {
+      "name": "Settings_Content_Background_Image",
+      "value": "Image"
+    },
+    {
+      "name": "Settings_Content_Color_Scheme_Light",
+      "value": "*Color Scheme: Light Mode"
+    },
+    {
+      "name": "Settings_Content_Color_Scheme_Dark",
+      "value": "*Color Scheme: Dark Mode"
+    },
+    {
+      "name": "Settings_Content_Color_Scheme_Description",
+      "value": "In this order:\nBackground Mask (Image),\nBackground (Pure Color),\nTexts (Image),\nTexts (Pure Color),\nCards Background (Image),\nCards Background (Pure Color)"
+    },
+    {
+      "name": "Settings_Content_Color_Scheme_Star",
+      "value": "Click Confirm to activate\nOptions marked with \"*\"\n=￣ω￣="
+    },
+    {
+      "name": "Settings_Content_Color_Scheme_Got_Messy",
+      "value": "Messed things up? Try this↓"
+    },
+    {
+      "name": "General_OK",
+      "value": "OK \uDB80\uDC13"
+    },
+    {
+      "name": "General_One_More_Confirm",
+      "value": "Click Again To CONFIRM \uDB80\uDD09"
+    },
+    {
+      "name": "General_RESET",
+      "value": "Reset \uDB80\uDCC8"
+    },
+    {
+      "name": "Welcome",
+      "value": "Welcome!"
+    },
+    {
+      "name": "Settings_Content_Blur_Radius",
+      "value": "Blur Radius (Image Background)"
+    },
+    {
+      "name": "Settings_Content_Min_Block_Size",
+      "value": "Minimum Card Width (Careful...)"
+    },
+    {
+      "name": "Add_Name_Title",
+      "value": "Card Name (Your Target!!)"
+    },
+    {
+      "name": "Add_Description",
+      "value": "Card Description"
+    },
+    {
+      "name": "Add_Time_Limit",
+      "value": "Time Limit"
+    },
+    {
+      "name": "Add_Day",
+      "value": " Day(s) (24 Hours Each)"
+    },
+    {
+      "name": "Add_Value_Unit_Hour",
+      "value": " Hours"
+    },
+    {
+      "name": "Add_Value_Unlimited",
+      "value": "The Sky Is The Limit!"
+    },
+    {
+      "name": "Add_Day_Unlimited",
+      "value": "Until FOREVER!"
+    },
+    {
+      "name": "Add_Target_Value",
+      "value": "Target"
+    },
+    {
+      "name": "Add_Length",
+      "value": "Card Length"
+    },
+    {
+      "name": "Add_Length_Notice_Short",
+      "value": "Medium"
+    },
+    {
+      "name": "Add_Length_Notice_Medium",
+      "value": "Long"
+    },
+    {
+      "name": "Add_Length_Notice_Long",
+      "value": "Loong"
+    },
+    {
+      "name": "Card_Days_Remaining",
+      "value": "Remaining "
+    },
+    {
+      "name": "Card_Days_Total",
+      "value": "In Total "
+    },
+    {
+      "name": "Card_Days_Unit_Day",
+      "value": " Day(s)"
+    },
+    {
+      "name": "Card_Progress_Done",
+      "value": "Done"
+    },
+    {
+      "name": "Card_Progress_Remaining_Time",
+      "value": "Time Left"
+    },
+    {
+      "name": "Card_Progress_Title_From_Now_On",
+      "value": "Now On"
+    },
+    {
+      "name": "Card_Progress_Desc_Time_Sufficient",
+      "value": "Time Sufficient!"
+    },
+    {
+      "name": "Card_Progress_Desc_Time_OK",
+      "value": "Ongoing!"
+    },
+    {
+      "name": "Card_Progress_Desc_Time_Quick",
+      "value": "Never Too Late!"
+    },
+    {
+      "name": "Card_Progress_Desc_Time_Ad_Astra_Abyssosque",
+      "value": "To The Stars!"
+    },
+    {
+      "name": "Card_Progress_Desc_Estimating",
+      "value": "Estimating Only"
+    },
+    {
+      "name": "Card_Progress_Desc_Estimating_Hours",
+      "value": "Hours Required Each Day\nTo Reach The END :D"
+    },
+    {
+      "name": "Card_Progress_Desc_Over_Due",
+      "value": "Never Too Late"
+    }
+  ]
+}

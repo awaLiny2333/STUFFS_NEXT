@@ -1,0 +1,28 @@
+{
+  "color": [
+    {
+      "name": "start_window_background",
+      "value": "#FFC1CFC6"
+    },
+    {
+      "name": "title_font_color_image",
+      "value": "#FFFFFFFF"
+    },
+    {
+      "name": "title_font_color_color",
+      "value": "#FF334C42"
+    },
+    {
+      "name": "block_background_image",
+      "value": "#80B4C3B9"
+    },
+    {
+      "name": "block_background_color",
+      "value": "#FFE3ECE7"
+    },
+    {
+      "name": "home_background_mask",
+      "value": "#4D1E3928"
+    }
+  ]
+}

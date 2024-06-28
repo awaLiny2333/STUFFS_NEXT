@@ -1,0 +1,212 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "喵"
+    },
+    {
+      "name": "EntryAbility_desc",
+      "value": "首页！"
+    },
+    {
+      "name": "EntryAbility_label",
+      "value": "做一件事"
+    },
+    {
+      "name": "Entry_Title",
+      "value": "做一件事"
+    },
+    {
+      "name": "Entry_Subtitle",
+      "value": "Liny 的 NEXT 应用 :)"
+    },
+    {
+      "name": "Greetings_Evening",
+      "value": "晚上好 \uD83C\uDF03"
+    },
+    {
+      "name": "Greetings_Morning",
+      "value": "早安 \uD83D\uDE3D"
+    },
+    {
+      "name": "Greetings_Sleep",
+      "value": "该去睡了 \\uD83D\\uDECF\\uFE0F"
+    },
+    {
+      "name": "Greetings_Noon",
+      "value": "正午 \uD83C\uDF5A"
+    },
+    {
+      "name": "Greetings_Afternoon",
+      "value": "下午好 \uD83D\uDCD6"
+    },
+    {
+      "name": "Encouragement",
+      "value": "生活\n就像海洋\n\n只有\n意志坚强的人\n才能\n到达彼岸"
+    },
+    {
+      "name": "Settings_block_Settings",
+      "value": "设置"
+    },
+    {
+      "name": "Settings_block_Add",
+      "value": "添加"
+    },
+    {
+      "name": "Settings_Content_Background",
+      "value": "背景风格"
+    },
+    {
+      "name": "Settings_Content_Background_Color",
+      "value": "纯色"
+    },
+    {
+      "name": "Settings_Content_Background_Image",
+      "value": "图片"
+    },
+    {
+      "name": "Settings_Content_Color_Scheme_Light",
+      "value": "＊配色方案：浅色模式"
+    },
+    {
+      "name": "Settings_Content_Color_Scheme_Dark",
+      "value": "＊配色方案：深色模式"
+    },
+    {
+      "name": "Settings_Content_Color_Scheme_Description",
+      "value": "依次为：\n背景遮罩（图片）\n背景（纯色）\n字体（图片）\n字体（纯色）\n卡片背景（图片）\n卡片背景（纯色）"
+    },
+    {
+      "name": "Settings_Content_Color_Scheme_Star",
+      "value": "标注『＊』的项目\n要点击确认后才生效喔\n=￣ω￣="
+    },
+    {
+      "name": "Settings_Content_Color_Scheme_Got_Messy",
+      "value": "搞砸，乱了，好使↓"
+    },
+    {
+      "name": "General_OK",
+      "value": "确认 \uDB80\uDC13"
+    },
+    {
+      "name": "General_One_More_Confirm",
+      "value": "再点一次以确认 \uDB80\uDD09"
+    },
+    {
+      "name": "General_RESET",
+      "value": "恢复默认 \uDB80\uDCC8"
+    },
+    {
+      "name": "Welcome",
+      "value": "终于等到你"
+    },
+    {
+      "name": "Settings_Content_Blur_Radius",
+      "value": "模糊半径（仅限图片背景）"
+    },
+    {
+      "name": "Settings_Content_Min_Block_Size",
+      "value": "最小卡片宽度（小心……）"
+    },
+    {
+      "name": "Add_Name_Title",
+      "value": "卡片名称（小目标！！）"
+    },
+    {
+      "name": "Add_Description",
+      "value": "卡片描述"
+    },
+    {
+      "name": "Add_Time_Limit",
+      "value": "完成期限"
+    },
+    {
+      "name": "Add_Day",
+      "value": " 天（每天 24 小时）"
+    },
+    {
+      "name": "Add_Day_Unlimited",
+      "value": "直到永远！"
+    },
+    {
+      "name": "Add_Value_Unit_Hour",
+      "value": " 小时"
+    },
+    {
+      "name": "Add_Value_Unlimited",
+      "value": "止于至善！"
+    },
+    {
+      "name": "Add_Target_Value",
+      "value": "目标"
+    },
+    {
+      "name": "Add_Length",
+      "value": "卡片长度"
+    },
+    {
+      "name": "Add_Length_Notice_Short",
+      "value": "中杯！"
+    },
+    {
+      "name": "Add_Length_Notice_Medium",
+      "value": "大杯！！"
+    },
+    {
+      "name": "Add_Length_Notice_Long",
+      "value": "超大杯！！！"
+    },
+    {
+      "name": "Card_Days_Remaining",
+      "value": "还剩 "
+    },
+    {
+      "name": "Card_Days_Total",
+      "value": "共 "
+    },
+    {
+      "name": "Card_Days_Unit_Day",
+      "value": " 天"
+    },
+    {
+      "name": "Card_Progress_Done",
+      "value": "已完成"
+    },
+    {
+      "name": "Card_Progress_Remaining_Time",
+      "value": "剩余时间"
+    },
+    {
+      "name": "Card_Progress_Title_From_Now_On",
+      "value": "此刻"
+    },
+    {
+      "name": "Card_Progress_Desc_Time_Sufficient",
+      "value": "时间充裕！"
+    },
+    {
+      "name": "Card_Progress_Desc_Time_OK",
+      "value": "正在进行时！"
+    },
+    {
+      "name": "Card_Progress_Desc_Time_Quick",
+      "value": "冲刺！冲刺！"
+    },
+    {
+      "name": "Card_Progress_Desc_Time_Ad_Astra_Abyssosque",
+      "value": "向着星辰与深渊！"
+    },
+    {
+      "name": "Card_Progress_Desc_Estimating",
+      "value": "每天仅需"
+    },
+    {
+      "name": "Card_Progress_Desc_Estimating_Hours",
+      "value": "即可圆满完成目标 :D"
+    },
+    {
+      "name": "Card_Progress_Desc_Over_Due",
+      "value": "来者犹可追"
+    }
+  ]
+}
