@@ -16,3 +16,8 @@
 3. 删除卡片（Ｏ）
 4. 编辑卡片（Ｏ）
 5. 数据看板（Ｏ）
+
+# 截图案例
+![Phone](Examples/Screenshot_Phone.png)
+![Foldable](Examples/Screenshot_Foldable.png)
+![Pad](Examples/Screenshot_Pad.png)
