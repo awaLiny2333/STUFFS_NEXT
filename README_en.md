@@ -16,3 +16,8 @@ Will try my best to build the basic framework as soon as possible(
 3. Cards deleting（Ｏ）
 4. Cards editing（Ｏ）
 5. Data board（Ｏ）
+
+# Screenshots
+![Phone](Examples/Screenshot_Phone.png)
+![Foldable](Examples/Screenshot_Foldable.png)
+![Pad](Examples/Screenshot_Pad.png)
