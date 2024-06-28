@@ -10,7 +10,7 @@ This app will automatically analyze your data and present you with a formatted r
 This project just started shortly after the opening of HDC 2024
 Will try my best to build the basic framework as soon as possible(
 
-# 功能和实现
+# Functions and Implementations
 1. Customization（Ｉ）
 2. Cards adding（Ｉ）
 3. Cards deleting（Ｏ）
