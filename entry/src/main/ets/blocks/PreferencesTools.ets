@@ -4,18 +4,18 @@ let context = getContext(this);
 
 export class PreferencesTools {
 
-  getPreferencesFromStorage(dbName: string) {
-    let preference = dataPreferences.getPreferences(context, dbName);
+  getPreferencesFromStorage() {
+    let preference = dataPreferences.getPreferences(context, "meow");
     return preference;
   }
 
-  async getValueOfKey(dbName: string,keyName: string){
-    const pre = await this.getPreferencesFromStorage(dbName)
+  async getValueOfKey(keyName: string){
+    const pre = await this.getPreferencesFromStorage()
     return await pre.get(keyName,"no")
   }
 
-  putValueOfKey(dbName:string, keyName: string, putContent: string | number){
-    this.getPreferencesFromStorage(dbName).then((preferencesGot)=>{
+  putValueOfKey(keyName: string, putContent: string | number){
+    this.getPreferencesFromStorage().then((preferencesGot)=>{
       try {
         preferencesGot.put(keyName,putContent)
       }
