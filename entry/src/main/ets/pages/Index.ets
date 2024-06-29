@@ -46,6 +46,10 @@ struct Index {
   @State Add_name_edit: string = ""
   @State Add_description_edit: string = ""
   @State Add_Length: number = 200
+  @State Edit_name_edit: string = ""
+  @State Edit_description_edit: string = ""
+  @State Edit_Length: number = 200
+  @State Edit_Length_Description: string = "app.string.Add_Length_Notice_Short"
   @State Add_Length_Description: string = "app.string.Add_Length_Notice_Short"
   @State Add_Time_Limit: number = 31
   @State Add_Time_Limit_Description: string = "app.string.Add_Day"
@@ -206,10 +210,11 @@ struct Index {
         })
       // Backdrop
 
-      Row() {}
+      Row() {
+      }
       .height("100%")
       .width("100%")
-      .backgroundColor(this.cover_continue_opacity == 0?
+      .backgroundColor(this.cover_continue_opacity == 0 ?
         (this.use_backdrop ? this.Color_scheme[0] : this.Color_scheme[1])
         : $r('app.color.start_window_background')
       )
@@ -257,7 +262,7 @@ struct Index {
 
         // BIG TITLE ("STUFFS")
 
-        WaterFlow({ scroller: this.scroller }) {
+        WaterFlow({}) {
 
           FlowItem() {
           }.height(130)
@@ -284,6 +289,8 @@ struct Index {
                   .onClick(() => {
                     this.Color_scheme_edit_confirm = 0
                     this.block_settings_is_open = false
+                    this.Add_name_edit = ""
+                    this.Add_description_edit = ""
                     if (this.block_add_is_open) {
                       this.block_settings_height = 170
                       this.block_add_is_open = false
@@ -822,8 +829,13 @@ struct Index {
               done: this.cards_done[key],
               time_limit: this.cards_time_limit[key],
               start: this.cards_start[key],
-              end: this.cards_end[key]
+              end: this.cards_end[key],
+              Edit_name_edit: this.Edit_name_edit,
+              Edit_description_edit: this.Edit_description_edit,
+              Edit_Length: this.Edit_Length,
+              Edit_Length_Description: this.Edit_Length_Description
             })
+
           })
 
           FlowItem() {
@@ -882,7 +894,7 @@ struct Index {
 
         // MAIN BODY OF CARDS
 
-        Scroll() {
+        Scroll(this.scroller) {
           Column() {
             Row() {
             }
@@ -904,7 +916,7 @@ struct Index {
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .offset({ y: (this.card_expanding == -1) ? 100 : 0 })
                     .visibility((this.card_expanding == -1) ? Visibility.Hidden : Visibility.Visible)
-                    .animation(this.animateParam(150))
+                    .animation(this.animateParam(this.card_expanding == -1? 0 : 150))
                     .width("100%")
                   // TITLE
 
@@ -925,7 +937,7 @@ struct Index {
                   }
                   .offset({ y: (this.card_expanding == -1) ? 100 : 0 })
                   .visibility((this.card_expanding == -1) ? Visibility.Hidden : Visibility.Visible)
-                  .animation(this.animateParam(200))
+                  .animation(this.animateParam(this.card_expanding == -1? 0 : 200))
                   .alignItems(VerticalAlign.Bottom)
                   .margin({ bottom: 14 })
                   .width("100%")
@@ -986,13 +998,13 @@ struct Index {
                     { color: "#D064bb5c", offset: 1 }
                   ]))
                   .strokeWidth(18)
-                  .trackShadow({ radius: 7, offsetX: 7, offsetY: 7 })
+                  .trackShadow({ radius: 7, offsetX: -7, offsetY: 7 })
                   .height(180)
                 }
                 .offset({ y: (this.card_expanding == -1) ? 100 : 10 })
                 .visibility((this.card_expanding == -1) ? Visibility.Hidden : Visibility.Visible)
                 .alignItems(this.Screen_width - 40 > 600 ? HorizontalAlign.End : HorizontalAlign.Center)
-                .animation(this.animateParam(350))
+                .animation(this.animateParam(this.card_expanding == -1? 0 : 350))
                 .width("100%")
                 .height("100%")
               }
@@ -1006,7 +1018,7 @@ struct Index {
                   Text($r(this.card_slogan))
                     .offset({ y: (this.card_expanding == -1) ? 100 : 0 })
                     .visibility((this.card_expanding == -1) ? Visibility.Hidden : Visibility.Visible)
-                    .animation(this.animateParam(400))
+                    .animation(this.animateParam(this.card_expanding == -1? 0 : 400))
                     .fontSize(22)
                     .maxLines(1)
                     .fontColor(this.font_color)
@@ -1043,13 +1055,13 @@ struct Index {
                   }
                   .offset({ y: (this.card_expanding == -1) ? 100 : 0 })
                   .visibility((this.card_expanding == -1) ? Visibility.Hidden : Visibility.Visible)
-                  .animation(this.animateParam(450))
+                  .animation(this.animateParam(this.card_expanding == -1? 0 : 450))
                   .indicator(null)
                   .startAngle(225)
                   .endAngle(135)
                   .colors(this.font_color)
                   .strokeWidth(18)
-                  .trackShadow({ radius: 7, offsetX: 7, offsetY: 7 })
+                  .trackShadow({ radius: 7, offsetX: -7, offsetY: 7 })
                   .height(180)
                 }
                 .alignItems(HorizontalAlign.Center)
@@ -1099,7 +1111,7 @@ struct Index {
                 .alignItems(HorizontalAlign.Center)
                 .offset({ y: (this.card_expanding == -1) ? 100 : 0 })
                 .visibility((this.card_expanding == -1) ? Visibility.Hidden : Visibility.Visible)
-                .animation(this.animateParam(500))
+                .animation(this.animateParam(this.card_expanding == -1? 0 : 500))
                 .width("100%")
 
                 // PLAN ESTIMATED
@@ -1108,6 +1120,116 @@ struct Index {
               .height(this.Screen_width - 40 > 600 ? 220 : 160)
 
               // EXPLANATION
+
+              FlowItem(){
+                Column({space:10}) {
+                  Text($r("app.string.Settings_block_Settings"))
+                    .visibility((this.card_expanding == -1) ? Visibility.Hidden : Visibility.Visible)
+                    .offset({ y: this.card_expanding != -1 ? 0 : 50 })
+                    .animation(this.animateParam(550))
+                    .fontSize(22)
+                    .maxLines(1)
+                    .fontColor(this.font_color)
+                    .fontWeight(FontWeight.Bold)
+                    .margin({ bottom: 15 })
+
+                  LinysLeftTitle({
+                    text: $r("app.string.Add_Name_Title"),
+                    show: this.card_expanding != -1,
+                    font_color: this.font_color,
+                    delay: 600,
+                  })
+
+                  TextArea({ placeholder: "=￣ω￣=", text: this.cards_name[this.last_expanded] })
+                    .fontColor(this.font_color)
+                    .onChange((value) => {
+                      this.Edit_name_edit = value
+                    })
+                    .height(39)
+                    .textOverflow(TextOverflow.Ellipsis)
+
+                  LinysLeftTitle({
+                    text: $r("app.string.Add_Description"),
+                    show: this.card_expanding != -1,
+                    font_color: this.font_color,
+                    delay: 0,
+                  })
+
+                  TextArea({ placeholder: "(〃￣︶￣)人(￣︶￣〃)", text: this.cards_desc[this.last_expanded] })
+                    .fontColor(this.font_color)
+                    .onChange((value) => {
+                      this.Edit_description_edit = value
+                    })
+                    .height(81)
+                    .textOverflow(TextOverflow.Ellipsis)
+
+                  LinysLeftTitle({
+                    text: $r("app.string.Add_Length"),
+                    show: this.card_expanding != -1,
+                    font_color: this.font_color,
+                    delay: 0,
+                  })
+
+                  Slider({
+                    style: SliderStyle.InSet,
+                    min: 200,
+                    max: 400,
+                    value: this.cards_length[this.last_expanded]
+                  })
+                    .blockColor(this.block_background)
+                    .selectedColor(this.font_color)
+                    .onChange((value: number, _mode: SliderChangeMode) => {
+                      this.Edit_Length = value
+                      if (value < 270) {
+                        this.Edit_Length_Description = "app.string.Add_Length_Notice_Short"
+                      } else if (value < 330) {
+                        this.Edit_Length_Description = "app.string.Add_Length_Notice_Medium"
+                      } else {
+                        this.Edit_Length_Description = "app.string.Add_Length_Notice_Long"
+                      }
+                    })
+
+                  LinysRightExplanation({
+                    text: $r(this.Edit_Length_Description),
+                    show: this.card_expanding != -1,
+                    font_color: this.font_color,
+                    max_lines: 1,
+                    delay: 400,
+                  })
+
+                  Button() {
+                    Text($r("app.string.General_OK"))
+                      .fontSize(15)
+                      .fontColor(this.block_background)
+                      .fontWeight(FontWeight.Bolder)
+                      .animation(this.animateParam(0))
+                  }
+                  .clickEffect({ level: ClickEffectLevel.LIGHT })
+                  .width("100%")
+                  .padding(5)
+                  .backgroundColor(this.font_color)
+                  .onClick(() => {
+                      // Save Card and Add
+                    this.cards_name[this.last_expanded] = this.Edit_name_edit
+                    if (this.Edit_description_edit == "") {
+                      console.log("empty desc")
+                      this.cards_desc[this.last_expanded] = "喵 meow"
+                    } else {
+                      this.cards_desc[this.last_expanded] = this.Edit_description_edit
+                    }
+                    this.cards_length[this.last_expanded] = this.Edit_Length
+
+                    this.storeCards()
+
+                  })
+                }
+                .alignItems(HorizontalAlign.Start)
+                .height("100%")
+
+              }
+              .width("100%")
+              .height(320)
+
             }
             .rowsGap(20)
             .borderRadius(16)
@@ -1116,8 +1238,8 @@ struct Index {
               color: this.use_backdrop ? this.Color_scheme[4] : this.Color_scheme[5]
             })
             .backgroundColor(this.use_backdrop ? "#00000000" : this.Color_scheme[5])
-            .padding(24)
-            .height(this.Screen_width - 40 > 600 ? this.Screen_height : 2 * this.Screen_height)
+            .padding(this.Screen_width - 40 > 600 ? 32 : 20)
+            .height(this.Screen_width - 40 > 600 ? 2 * this.Screen_height : 4 * this.Screen_height)
             .width(Math.min(this.Screen_width - 40, 600))
             .columnsTemplate(this.Screen_width - 40 > 600 ? "1fr 1fr" : "1fr")
             .border({ width: 1, color: "#4d7a7a7a" })
@@ -1150,6 +1272,7 @@ struct Index {
         .height("100%")
         .onClick(() => {
           this.card_expanding = -1
+          this.scroller.scrollTo({xOffset:0,yOffset:0})
         })
         .edgeEffect(EdgeEffect.Spring)
 
@@ -1197,10 +1320,10 @@ struct Index {
       .animation({ delay: 0, duration: 500, curve: Curve.ExtremeDeceleration })
       .visibility(this.Color_scheme.length == 0 ? Visibility.Visible : Visibility.None)
       .animation({ delay: 510, duration: 10 })
-      .onAreaChange(()=>{
-        setTimeout(()=>{
+      .onAreaChange(() => {
+        setTimeout(() => {
           this.cover_continue_opacity = 0
-        },200)
+        }, 200)
       })
 
       // COVER CONTINUES
@@ -1389,6 +1512,11 @@ struct LinysBlock {
   @Link card_slogan: string;
   @State expanded_width: number = Math.min(500, this.screen_width - 40)
   @State waterflow_column_count: number = 0
+  @Link Edit_Length_Description: string;
+  @Link Edit_name_edit: string;
+  @Link Edit_description_edit: string;
+  @Link Edit_Length: number;
+
 
   build() {
     FlowItem() {
@@ -1531,6 +1659,17 @@ struct LinysBlock {
         }
         console.log(this.name + " " + this.index.toString() + ": " + this.target.toString() + "_" +
         this.time_limit.toString())
+      }
+        this.Edit_name_edit = this.name
+        this.Edit_description_edit = this.desc
+        this.Edit_Length = this.card_length
+
+      if (this.card_length < 270) {
+        this.Edit_Length_Description = "app.string.Add_Length_Notice_Short"
+      } else if (this.card_length < 330) {
+        this.Edit_Length_Description = "app.string.Add_Length_Notice_Medium"
+      } else {
+        this.Edit_Length_Description = "app.string.Add_Length_Notice_Long"
       }
     })
 
