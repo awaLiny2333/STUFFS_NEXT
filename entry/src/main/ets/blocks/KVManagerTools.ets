@@ -60,34 +60,27 @@ if (kvManager !== undefined) {
 
 export class KVManagerTools {
 
-  async getValueOfKey(keyName: string){
+  async getValueOfKey(keyName: string) {
     if (kvStore !== undefined) {
-      //进行后续操作
-      //...
-
-      // kvStore.get(keyName, (err, data) => {
-      //   if (err != undefined) {
-      //     console.error(`Failed to get data. Code:${err.code},message:${err.message} qwq`);
-      //     return "no";
-      //   }
-      //   console.info(`Succeeded in getting data. Data:${data} qwq`);
-      //   return data;
-      // });
-
       return await kvStore.get(keyName)
+    } else {
+      console.log("Cannot get because of a null kvstore " + keyName)
+      return "no";
     }
-    return "no";
   }
 
-  putValueOfKey(keyName: string, putContent: string){
+  putValueOfKey(keyName: string, putContent: string) {
     if (kvStore !== undefined) {
       kvStore.put(keyName, putContent, (err) => {
         if (err !== undefined) {
           console.error(`Failed to put data. Code:${err.code},message:${err.message}`);
           return;
+        } else {
+          console.info('Succeeded in putting data. Data:' + putContent + " qwq");
         }
-        console.info('Succeeded in putting data. Data:' + putContent + " qwq");
       });
+    } else {
+      console.log("Cannot put because of a null kvstore " + putContent)
     }
   }
 
