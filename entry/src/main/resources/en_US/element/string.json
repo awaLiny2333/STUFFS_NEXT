@@ -202,7 +202,7 @@
     },
     {
       "name": "Card_Progress_Desc_Estimating_Hours",
-      "value": "Hours Required Each Day\nTo Reach The END :D"
+      "value": "Required Each Day\nTo Reach The END :D"
     },
     {
       "name": "Card_Progress_Desc_Over_Due",
@@ -219,6 +219,35 @@
     {
       "name": "Card_Progress_Manage_Delete",
       "value": "Delete This Card \uDB80\uDC01"
+    },
+    {
+      "name": "Card_Progress_Manage_Delete_Cannot_Ongoing",
+      "value": "Stop This Card First \uDB80\uDC2B"
+    },
+    {
+      "name": "Work_Title_Ongoing_Nothing",
+      "value": "Nothing"
+    },
+    {
+      "name": "Work_Title_Ongoing",
+      "value": "Already Done"
+    },
+    {
+      "name": "Work_Title_OK",
+      "value": "Submit"
+    },
+    {
+      "name": "Work_Title_Not_Working",
+      "value": "Messing Around"
+    },
+    {
+      "name": "Work_Start",
+      "value": "I Will Start NOW \uDB80\uDCB4"
+    },
+    {
+      "name": "Work_Start_Cannot_Since_Another_Ongoing",
+      "value": "Task Ongoing \uDB80\uDC2B"
     }
   ]
+
 }

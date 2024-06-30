@@ -219,6 +219,34 @@
     {
       "name": "Card_Progress_Manage_Delete",
       "value": "删除此卡片 \uDB80\uDC01"
+    },
+    {
+      "name": "Card_Progress_Manage_Delete_Cannot_Ongoing",
+      "value": "需要先结束 \uDB80\uDC2B"
+    },
+    {
+      "name": "Work_Title_Ongoing_Nothing",
+      "value": "无事"
+    },
+    {
+      "name": "Work_Title_Ongoing",
+      "value": "已经进行"
+    },
+    {
+      "name": "Work_Title_OK",
+      "value": "完成记录"
+    },
+    {
+      "name": "Work_Title_Not_Working",
+      "value": "摸鱼中"
+    },
+    {
+      "name": "Work_Start",
+      "value": "我将立刻开始 \uDB80\uDCB4"
+    },
+    {
+      "name": "Work_Start_Cannot_Since_Another_Ongoing",
+      "value": "已经在进行中 \uDB80\uDC2B"
     }
   ]
 }

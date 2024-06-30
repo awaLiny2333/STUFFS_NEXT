@@ -83,6 +83,9 @@ struct Index {
   @State DATA_cards_done: number[] = []
   @State DATA_cards_start: number[] = []
   @State DATA_cards_end: number[] = []
+  @State DATA_work_working_card_name: string = ""
+  @State DATA_work_start: number = 0
+  @State DATA_work_last_end: number = systemDateTime.getTime()
   scroller: Scroller = new Scroller()
 
   onPageShow() {
@@ -93,14 +96,13 @@ struct Index {
         // First open app then put
         PreferencesTools.putValueOfKey("meow", "meow")
         KVManagerTools.putValueOfKey("use_backdrop", "false")
-        KVManagerTools.putValueOfKey("color_scheme_light",
-          this.DESIGN_color_scheme_light_default)
-        KVManagerTools.putValueOfKey("color_scheme_dark",
-          this.DESIGN_color_scheme_dark_default)
+        KVManagerTools.putValueOfKey("color_scheme_light", this.DESIGN_color_scheme_light_default)
+        KVManagerTools.putValueOfKey("color_scheme_dark", this.DESIGN_color_scheme_dark_default)
         KVManagerTools.putValueOfKey("blur_radius", "25")
         KVManagerTools.putValueOfKey("Min_block_size", this.DESIGN_min_card_size.toString())
         KVManagerTools.putValueOfKey("APP_open_time", this.DATA_app_open_time.toString())
 
+        this.storeWorkingState()
         this.storeCards()
 
       } else {
@@ -175,6 +177,15 @@ struct Index {
           if (temp[0] == "") {
             this.DATA_cards_end = []
           }
+        })
+        KVManagerTools.getValueOfKey("DATA_work_working_card_name").then((result) => {
+          this.DATA_work_working_card_name = result as string
+        })
+        KVManagerTools.getValueOfKey("DATA_work_start").then((result) => {
+          this.DATA_work_start = Number(result as string)
+        })
+        KVManagerTools.getValueOfKey("DATA_work_last_end").then((result) => {
+          this.DATA_work_last_end = Number(result as string)
         })
       }
       this.readDesign()
@@ -524,6 +535,7 @@ struct Index {
               .padding({ left: 20, right: 20 })
               .position({ y: 165 })
               .visibility(this.STATUS_top_card_settings_is_open ? Visibility.Visible : Visibility.None)
+              .animation(this.animateParam(0))
 
               // Settings Content
 
@@ -799,6 +811,81 @@ struct Index {
 
           // SETTINGS AND ADD BLOCK
 
+          FlowItem() {
+            RelativeContainer() {
+              Column({ space: 5 }) {
+                Text(this.DATA_work_working_card_name == "" ? $r('app.string.Work_Title_Ongoing_Nothing') :
+                this.DATA_work_working_card_name)
+                  .fontSize(25)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(this.DESIGN_font_color)
+                  .width("100%")
+                Text($r('app.string.Work_Title_Ongoing'))
+                  .fontSize(16)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(this.DESIGN_font_color)
+                  .width("100%")
+                Text(this.DATA_work_working_card_name == "" ?
+                ((systemDateTime.getTime() - this.DATA_work_last_end) / 1000 / 3600).toFixed(2).toString() :
+                ((systemDateTime.getTime() - this.DATA_work_start) / 1000 / 3600).toFixed(2).toString())
+                  .maxLines(1)
+                  .fontSize(60)
+                  .fontWeight(FontWeight.Bold)
+                  .fontColor(this.DESIGN_font_color)
+                  .width("100%")
+                Text($r('app.string.Add_Value_Unit_Hour'))
+                  .fontSize(16)
+                  .fontWeight(FontWeight.Normal)
+                  .fontColor(this.DESIGN_font_color)
+                  .width("100%")
+              }
+              .alignItems(HorizontalAlign.Start)
+              .height("100%")
+
+              Button() {
+                Column() {
+                  SymbolGlyph(this.DATA_work_working_card_name == "" ?
+                  $r("sys.symbol.battery_75percent") : $r("sys.symbol.checkmark"))
+                    .fontSize(45)
+                    .fontColor([this.DESIGN_font_color])
+                    .symbolEffect(new ReplaceSymbolEffect(EffectScope.WHOLE), this.DATA_work_working_card_name == "")
+                  Text(this.DATA_work_working_card_name == "" ? $r("app.string.Work_Title_Not_Working") :
+                  $r('app.string.Work_Title_OK'))
+                    .fontSize(16)
+                    .fontColor(this.DESIGN_font_color)
+                }
+                .alignItems(HorizontalAlign.Center)
+              }
+              .type(ButtonType.Normal)
+              .borderRadius(16)
+              .alignRules({
+                right: { anchor: "__container__", align: HorizontalAlign.End },
+                bottom: { anchor: "__container__", align: VerticalAlign.Bottom }
+              })
+              .backgroundColor("#00000000")
+              .padding(10)
+              .onClick(() => {
+                this.endCard()
+              })
+            }
+            .width("100%")
+            .height("100%")
+            .align(Alignment.TopStart)
+            .padding(20)
+          }
+          .height(300)
+          .width("100%")
+          .borderRadius(16)
+          .border({ width: 1, color: "#4D7A7A7A" })
+          .backgroundEffect({
+            radius: this.DESIGN_use_backdrop ? this.DESIGN_cards_blur_radius : 0,
+            color: this.DESIGN_block_background_color
+          })
+          .backgroundColor(this.DESIGN_use_backdrop ? "#00000000" : this.DESIGN_color_scheme[5])
+          .animation(this.animateParam(0))
+
+          // WORKING STATUS
+
           ForEach(this.DATA_cards_name, (_content: string, key: number) => {
             LinysBlock({
               ENVIRONMENT_waterFlow_column_count: this.UI_waterFlow_Columns,
@@ -921,7 +1008,8 @@ struct Index {
                   // TITLE
 
                   Row() {
-                    Text(String(this.DATA_cards_done[this.STATUS_card_index_of_last_expanded]))
+                    Text(this.DATA_cards_done[this.STATUS_card_index_of_last_expanded] != undefined ?
+                    this.DATA_cards_done[this.STATUS_card_index_of_last_expanded].toFixed(2) : "")
                       .fontSize(50)
                       .fontColor(this.DESIGN_font_color)
                       .fontWeight(FontWeight.Bold)
@@ -959,7 +1047,7 @@ struct Index {
                 .height("100%")
               }
               .width("100%")
-              .height(200)
+              .height(190)
 
               // BASIC INFO
 
@@ -975,7 +1063,7 @@ struct Index {
                     Column() {
                       Text(String(this.DATA_cards_target[this.STATUS_card_index_of_last_expanded] == 1001 ?
                         50 : (this.DATA_cards_done[this.STATUS_card_index_of_last_expanded] /
-                        this.DATA_cards_target[this.STATUS_card_index_of_last_expanded])) + " %")
+                      this.DATA_cards_target[this.STATUS_card_index_of_last_expanded]).toFixed(2)) + " %")
                         .fontWeight(FontWeight.Medium)
                         .fontSize(20)
                         .fontColor(this.DESIGN_font_color)
@@ -1012,7 +1100,7 @@ struct Index {
                 .height("100%")
               }
               .width("100%")
-              .height(200)
+              .height(190)
 
               // DONE GRAPH
 
@@ -1072,31 +1160,32 @@ struct Index {
                 }
                 .alignItems(HorizontalAlign.Center)
                 .width("100%")
-                .height("100%")
               }
               .width("100%")
-              .height(220)
+              .height(this.ENVIRONMENT_screen_width - 40 > 600 ? 270 : 200)
 
               // TIME LEFT GRAPH
 
               FlowItem() {
-                Column() {
+                Column({ space: 5 }) {
                   Text($r("app.string.Card_Progress_Desc_Estimating"))
-                    .fontSize(18)
+                    .fontSize(16)
                     .fontColor(this.DESIGN_font_color)
-                    .margin({ bottom: 5 })
+
                   Row() {
                     Text(
-                      this.UI_card_expanded_remaining_days == 0 ? "1" : (
+                      this.DATA_cards_target[this.STATUS_card_index_of_last_expanded]
+                        < this.DATA_cards_done[this.STATUS_card_index_of_last_expanded] ? "( •̀ ω •́ )✧" :
 
-                        this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded] == 367 ||
-                          this.DATA_cards_target[this.STATUS_card_index_of_last_expanded] == 1001 ? " ∞ " :
-                        String(
-                          ((this.DATA_cards_target[this.STATUS_card_index_of_last_expanded] -
-                          this.DATA_cards_done[this.STATUS_card_index_of_last_expanded]) /
-                          this.UI_card_expanded_remaining_days).toFixed(4)
+                        this.UI_card_expanded_remaining_days == 0 ? "1" : (
+                          this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded] == 367 ||
+                            this.DATA_cards_target[this.STATUS_card_index_of_last_expanded] == 1001 ? " ∞ " :
+                          String(
+                            ((this.DATA_cards_target[this.STATUS_card_index_of_last_expanded] -
+                            this.DATA_cards_done[this.STATUS_card_index_of_last_expanded]) /
+                            this.UI_card_expanded_remaining_days).toFixed(4)
+                          )
                         )
-                      )
 
                     )
                       .fontSize(40)
@@ -1107,13 +1196,34 @@ struct Index {
                       .fontColor(this.DESIGN_font_color)
                       .margin({ bottom: 6 })
                   }
-                  .margin({ bottom: 5 })
                   .alignItems(VerticalAlign.Bottom)
 
                   Text($r('app.string.Card_Progress_Desc_Estimating_Hours'))
-                    .fontSize(18)
+                    .fontSize(16)
                     .fontColor(this.DESIGN_font_color)
                     .textAlign(TextAlign.Center)
+
+                  Button() {
+                    Text(this.DATA_work_working_card_name == "" ?
+                    $r("app.string.Work_Start") : $r("app.string.Work_Start_Cannot_Since_Another_Ongoing"))
+                      .fontSize(15)
+                      .fontColor(this.DESIGN_block_background_color)
+                      .fontWeight(FontWeight.Bolder)
+
+                  }
+                  .clickEffect({ level: ClickEffectLevel.LIGHT })
+                  .width("100%")
+                  .padding(5)
+                  .margin({ top: 15 })
+                  .backgroundColor(this.DESIGN_font_color)
+                  .onClick(() => {
+                    if (this.DATA_work_working_card_name == "") {
+                      this.startCard(this.DATA_cards_name[this.STATUS_card_expanding])
+                      this.STATUS_card_expanding = -1
+                      this.STATUS_card_index_of_last_expanded = -1
+                      this.scroller.scrollTo({ xOffset: 0, yOffset: 0 })
+                    }
+                  })
                 }
                 .alignItems(HorizontalAlign.Center)
                 .offset({ y: (this.STATUS_card_expanding == -1) ? 100 : 0 })
@@ -1124,7 +1234,7 @@ struct Index {
                 // PLAN ESTIMATED
               }
               .width("100%")
-              .height(this.ENVIRONMENT_screen_width - 40 > 600 ? 220 : 160)
+              .height(this.ENVIRONMENT_screen_width - 40 > 600 ? 270 : 240)
 
               // EXPLANATION
 
@@ -1286,11 +1396,13 @@ struct Index {
 
                   // MOVE TO TOP BUTTON
 
-                  Blank()
-
                   Button() {
-                    Text(this.EDIT_delete_card_confirm == false ?
-                    $r("app.string.Card_Progress_Manage_Delete") : $r('app.string.General_One_More_Confirm'))
+                    Text(
+                      this.DATA_cards_name[this.STATUS_card_expanding] == this.DATA_work_working_card_name ?
+                      $r('app.string.Card_Progress_Manage_Delete_Cannot_Ongoing') :
+                        this.EDIT_delete_card_confirm == false ? $r("app.string.Card_Progress_Manage_Delete") :
+                        $r('app.string.General_One_More_Confirm')
+                    )
                       .fontSize(15)
                       .fontColor(this.EDIT_delete_card_confirm == false ? this.DESIGN_block_background_color :
                       this.DESIGN_font_color)
@@ -1303,6 +1415,11 @@ struct Index {
                   .animation(this.animateParam(0))
                   .clickEffect({ level: ClickEffectLevel.LIGHT })
                   .onClick(() => {
+                    if (this.DATA_cards_name[this.STATUS_card_expanding] == this.DATA_work_working_card_name) {
+                      // ONGOING NO DELETE
+                      return
+                    }
+
                     // DELETE CARD
                     if (this.EDIT_delete_card_confirm == false) {
                       this.EDIT_delete_card_confirm = true
@@ -1597,6 +1714,32 @@ struct Index {
          * */
   }
 
+  startCard(name: string) {
+    if (this.DATA_work_working_card_name == "") {
+      this.DATA_work_working_card_name = name
+      this.DATA_work_start = systemDateTime.getTime()
+      this.storeWorkingState()
+    } else {
+      console.log("Cannot Start Card Since There Already Exists an Ongoing Card")
+    }
+  }
+
+  endCard() {
+    if (this.DATA_work_working_card_name == "") {
+      console.log("Cannot End Card Since NO Card is Ongoing")
+      // Is currently not working
+    } else {
+      let time_length = (systemDateTime.getTime() - this.DATA_work_start) / 1000 / 3600
+      this.DATA_cards_done[this.DATA_cards_name.indexOf(this.DATA_work_working_card_name)] += time_length
+      this.DATA_work_working_card_name = ""
+      this.DATA_work_start = 0
+      this.DATA_work_last_end = systemDateTime.getTime()
+      this.storeWorkingState()
+      this.storeCards()
+      // End Card Work
+    }
+  }
+
   storeCurrentDesign() {
     console.log(this.DESIGN_color_scheme_light.toString() + ' light_qwq')
     console.log(this.DESIGN_color_scheme_dark.toString() + ' dark_qwq')
@@ -1617,6 +1760,12 @@ struct Index {
     KVManagerTools.putValueOfKey("cards_done", this.DATA_cards_done.toString())
     KVManagerTools.putValueOfKey("cards_start", this.DATA_cards_start.toString())
     KVManagerTools.putValueOfKey("cards_end", this.DATA_cards_end.toString())
+  }
+
+  storeWorkingState() {
+    KVManagerTools.putValueOfKey("DATA_work_working_card_name", this.DATA_work_working_card_name)
+    KVManagerTools.putValueOfKey("DATA_work_start", this.DATA_work_start.toString())
+    KVManagerTools.putValueOfKey("DATA_work_last_end", this.DATA_work_last_end.toString())
   }
 
   animateParam(delay: number) {
@@ -1672,7 +1821,7 @@ struct LinysBlock {
           // BIG TITLE
 
           Row() {
-            Text(String(this.done))
+            Text(this.done == undefined? "" : this.done.toFixed(2))
               .fontSize(50)
               .fontColor(this.DESIGN_font_color)
               .fontWeight(FontWeight.Bold)
@@ -1755,7 +1904,7 @@ struct LinysBlock {
     .offset({ y: this.UI_y_offset })
     .opacity(this.UI_block_opacity)
     .animation({
-      delay: this.index > this.ENVIRONMENT_waterFlow_column_count * 2.5 ? 200 : this.UI_timeout + 400,
+      delay: this.index > this.ENVIRONMENT_waterFlow_column_count * 2.5 ? 200 : this.UI_timeout + 300,
       duration: 300,
       curve: Curve.ExtremeDeceleration
     })
