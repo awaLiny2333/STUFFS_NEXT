@@ -207,6 +207,18 @@
     {
       "name": "Card_Progress_Desc_Over_Due",
       "value": "Never Too Late"
+    },
+    {
+      "name": "Card_Progress_Title_Manage",
+      "value": "Manage"
+    },
+    {
+      "name": "Card_Progress_Manage_Move_To_Top",
+      "value": "Move To Top \uDB80\uDCCF"
+    },
+    {
+      "name": "Card_Progress_Manage_Delete",
+      "value": "Delete This Card \uDB80\uDC01"
     }
   ]
 }

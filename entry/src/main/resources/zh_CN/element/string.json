@@ -207,6 +207,18 @@
     {
       "name": "Card_Progress_Desc_Over_Due",
       "value": "来者犹可追"
+    },
+    {
+      "name": "Card_Progress_Title_Manage",
+      "value": "管理"
+    },
+    {
+      "name": "Card_Progress_Manage_Move_To_Top",
+      "value": "置顶 \uDB80\uDCCF"
+    },
+    {
+      "name": "Card_Progress_Manage_Delete",
+      "value": "删除此卡片 \uDB80\uDC01"
     }
   ]
 }
