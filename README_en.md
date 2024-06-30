@@ -13,8 +13,8 @@ Will try my best to build the basic framework as soon as possible(
 # Functions and Implementations
 1. Customization（Ｉ）
 2. Cards adding（Ｉ）
-3. Cards deleting（Ｏ）
-4. Cards editing（Ｏ）
+3. Cards deleting（Ｉ）
+4. Cards editing（Ｉ）
 5. Data board（Ｏ）
 
 # Screenshots
