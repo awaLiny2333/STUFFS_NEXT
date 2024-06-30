@@ -2,7 +2,6 @@ import display from '@ohos.display';
 import { SegmentButton, SegmentButtonOptions } from '@ohos.arkui.advanced.SegmentButton';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import KVManagerTools from '../blocks/KVManagerTools';
-import { distributedKVStore } from '@kit.ArkData';
 import { systemDateTime } from '@kit.BasicServicesKit';
 import PreferencesTools from '../blocks/PreferencesTools';
 
@@ -74,6 +73,7 @@ struct Index {
   @State EDIT_description: string = ""
   @State EDIT_length: number = 200
   @State EDIT_length_description: string = "app.string.Add_Length_Notice_Short"
+  @State EDIT_delete_card_confirm: boolean = false
   @State DATA_app_open_time: number = 0
   @State DATA_cards_name: string[] = []
   @State DATA_cards_desc: string[] = []
@@ -83,7 +83,6 @@ struct Index {
   @State DATA_cards_done: number[] = []
   @State DATA_cards_start: number[] = []
   @State DATA_cards_end: number[] = []
-  kvStore: distributedKVStore.SingleKVStore | undefined = undefined;
   scroller: Scroller = new Scroller()
 
   onPageShow() {
@@ -193,24 +192,24 @@ struct Index {
 
   build() {
     RelativeContainer() {
-      Image($r("app.media.bg1"))// .width(this.card_expanding == -1? "100%": this.Screen_width * 1.2)
-        // .height(this.card_expanding == -1? "100%": this.Screen_height * 1.2)
-        .width("100%")
-        .height("100%")
-        .animation({ duration: 800, curve: Curve.ExtremeDeceleration })
+      Image($r("app.media.bg1"))
+        .width(this.STATUS_card_expanding == -1 ? "100%" : this.ENVIRONMENT_screen_width * 1.1)
+        .height(this.STATUS_card_expanding == -1 ? "100%" : this.ENVIRONMENT_screen_height * 1.1)
+        .animation({ delay: 30, duration: 800, curve: Curve.ExtremeDeceleration })
         .alignRules({
           center: { anchor: "__container__", align: VerticalAlign.Center },
           middle: { anchor: "__container__", align: HorizontalAlign.Center }
         })
+
       // Backdrop
 
       Row() {
       }
       .height("100%")
       .width("100%")
-      .backgroundColor(this.UI_start_up_cover_continue_opacity == 0 ?
+      .backgroundColor(this.UI_start_up_cover_continue_opacity != 0 ?
+      $r('app.color.start_window_background') :
         (this.DESIGN_use_backdrop ? this.DESIGN_color_scheme[0] : this.DESIGN_color_scheme[1])
-        : $r('app.color.start_window_background')
       )
       .animation({ duration: 300, curve: Curve.ExtremeDeceleration })
 
@@ -831,6 +830,8 @@ struct Index {
 
           })
 
+          // MAIN CARDS
+
           FlowItem() {
             RelativeContainer() {
               Text($r("app.string.Encouragement"))
@@ -893,6 +894,12 @@ struct Index {
             .height((this.STATUS_card_expanding == -1) ? this.ENVIRONMENT_screen_height * 1 :
               this.ENVIRONMENT_screen_height * 0.25)
             .animation({ delay: 50, duration: 350, curve: Curve.ExtremeDeceleration })
+            .onAreaChange(() => {
+              this.EDIT_delete_card_confirm = false
+
+              // RESET STUFFS WHEN EXPANDING
+
+            })
 
             // PLACEHOLDER
 
@@ -940,6 +947,8 @@ struct Index {
                   Text("“" + this.DATA_cards_desc[this.STATUS_card_index_of_last_expanded] + "”")
                     .fontWeight(FontWeight.Medium)
                     .fontSize(16)
+                    .maxLines(3)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .fontColor(this.DESIGN_font_color)
                     .offset({ y: (this.STATUS_card_expanding == -1) ? 100 : 0 })
                     .visibility((this.STATUS_card_expanding == -1) ? Visibility.Hidden : Visibility.Visible)
@@ -948,7 +957,6 @@ struct Index {
                 }
                 .width("100%")
                 .height("100%")
-                .align(Alignment.Center)
               }
               .width("100%")
               .height(200)
@@ -1150,6 +1158,8 @@ struct Index {
                     .height(39)
                     .textOverflow(TextOverflow.Ellipsis)
 
+                  // CARD NAME
+
                   LinysLeftTitle({
                     UI_text: $r("app.string.Add_Description"),
                     STATUS_show: this.STATUS_card_expanding != -1,
@@ -1167,6 +1177,8 @@ struct Index {
                     })
                     .height(81)
                     .textOverflow(TextOverflow.Ellipsis)
+
+                  // CARD DESCRIPTION
 
                   LinysLeftTitle({
                     UI_text: $r("app.string.Add_Length"),
@@ -1202,6 +1214,8 @@ struct Index {
                     UI_delay: 400,
                   })
 
+                  // CARD LENGTH
+
                   Button() {
                     Text($r("app.string.General_OK"))
                       .fontSize(15)
@@ -1227,15 +1241,105 @@ struct Index {
                     this.storeCards()
 
                   })
+
+                  // CONFIRM BUTTON
                 }
                 .alignItems(HorizontalAlign.Start)
                 .height("100%")
-
               }
               .width("100%")
-              .height(320)
+              .height(400)
+
+              // SETTINGS I
+
+              FlowItem() {
+                Column({ space: 10 }) {
+
+                  Text($r("app.string.Card_Progress_Title_Manage"))
+                    .visibility((this.STATUS_card_expanding == -1) ? Visibility.Hidden : Visibility.Visible)
+                    .offset({ y: this.STATUS_card_expanding != -1 ? 0 : 50 })
+                    .animation(this.animateParam(600))
+                    .fontSize(22)
+                    .maxLines(1)
+                    .fontColor(this.DESIGN_font_color)
+                    .fontWeight(FontWeight.Bold)
+                    .margin({ bottom: 15 })
+
+                  Button() {
+                    Text($r("app.string.Card_Progress_Manage_Move_To_Top"))
+                      .fontSize(15)
+                      .fontColor(this.DESIGN_block_background_color)
+                      .fontWeight(FontWeight.Bolder)
+                      .animation(this.animateParam(0))
+                  }
+                  .clickEffect({ level: ClickEffectLevel.LIGHT })
+                  .width("100%")
+                  .padding(5)
+                  .backgroundColor(this.DESIGN_font_color)
+                  .onClick(() => {
+                    this.move_card_to_index(this.STATUS_card_expanding, 0)
+                    // SWITCH CARD POSITIONS
+                    this.STATUS_card_expanding = 0
+                    this.STATUS_card_index_of_last_expanded = 0
+                    this.storeCards()
+                  })
+
+                  // MOVE TO TOP BUTTON
+
+                  Blank()
+
+                  Button() {
+                    Text(this.EDIT_delete_card_confirm == false ?
+                    $r("app.string.Card_Progress_Manage_Delete") : $r('app.string.General_One_More_Confirm'))
+                      .fontSize(15)
+                      .fontColor(this.EDIT_delete_card_confirm == false ? this.DESIGN_block_background_color :
+                      this.DESIGN_font_color)
+                      .fontWeight(FontWeight.Bolder)
+                  }
+                  .width("100%")
+                  .padding(5)
+                  .backgroundColor(this.EDIT_delete_card_confirm == false ? this.DESIGN_font_color :
+                  this.DESIGN_block_background_color)
+                  .animation(this.animateParam(0))
+                  .clickEffect({ level: ClickEffectLevel.LIGHT })
+                  .onClick(() => {
+                    // DELETE CARD
+                    if (this.EDIT_delete_card_confirm == false) {
+                      this.EDIT_delete_card_confirm = true
+                    } else if (this.EDIT_delete_card_confirm == true) {
+                      this.EDIT_delete_card_confirm = false
+
+                      this.DATA_cards_name.splice(this.STATUS_card_expanding, 1)
+                      this.DATA_cards_desc.splice(this.STATUS_card_expanding, 1)
+                      this.DATA_cards_length.splice(this.STATUS_card_expanding, 1)
+                      this.DATA_cards_time_limit.splice(this.STATUS_card_expanding, 1)
+                      this.DATA_cards_target.splice(this.STATUS_card_expanding, 1)
+                      this.DATA_cards_done.splice(this.STATUS_card_expanding, 1)
+                      this.DATA_cards_start.splice(this.STATUS_card_expanding, 1)
+                      this.DATA_cards_end.splice(this.STATUS_card_expanding, 1)
+
+                      this.scroller.scrollTo({ xOffset: 0, yOffset: 0 })
+                      this.STATUS_card_expanding = -1
+                      this.STATUS_card_index_of_last_expanded = -1
+
+                      this.storeCards()
+                    }
+                  })
+
+                  // DELETE CARD BUTTON
+
+                }
+                .alignItems(HorizontalAlign.Start)
+                .height("100%")
+                .width("100%")
+              }
+              .width("100%")
+              .height(400)
+
+              // MANAGING
 
             }
+            .columnsGap(16)
             .rowsGap(20)
             .borderRadius(16)
             .backgroundEffect({
@@ -1250,7 +1354,7 @@ struct Index {
             .columnsTemplate(this.ENVIRONMENT_screen_width - 40 > 600 ? "1fr 1fr" : "1fr")
             .border({ width: 1, color: "#4d7a7a7a" })
 
-            // INFO
+            // INFO BODY
           }
           .width("100%")
           .alignItems(HorizontalAlign.Center)
@@ -1324,11 +1428,11 @@ struct Index {
       .opacity(this.UI_start_up_cover_continue_opacity)
       .animation({ delay: 0, duration: 500, curve: Curve.ExtremeDeceleration })
       .visibility(this.DESIGN_color_scheme.length == 0 ? Visibility.Visible : Visibility.None)
-      .animation({ delay: 510, duration: 10 })
+      .animation({ delay: 510, duration: 50 })
       .onAreaChange(() => {
         setTimeout(() => {
           this.UI_start_up_cover_continue_opacity = 0
-        }, 200)
+        }, 100)
       })
 
       // COVER CONTINUES
@@ -1413,6 +1517,54 @@ struct Index {
     this.DESIGN_block_background_color =
       this.DESIGN_use_backdrop ? this.DESIGN_color_scheme[4] : this.DESIGN_color_scheme[5]
     KVManagerTools.putValueOfKey("use_backdrop", String(this.DESIGN_use_backdrop))
+  }
+
+  switch_card_position(first: number, second: number) {
+    let temp: string | number = ""
+    temp = this.DATA_cards_name[first]
+    this.DATA_cards_name[first] = this.DATA_cards_name[second]
+    this.DATA_cards_name[second] = temp
+    temp = this.DATA_cards_desc[first]
+    this.DATA_cards_desc[first] = this.DATA_cards_desc[second]
+    this.DATA_cards_desc[second] = temp
+    temp = this.DATA_cards_length[first]
+    this.DATA_cards_length[first] = this.DATA_cards_length[second]
+    this.DATA_cards_length[second] = temp
+    temp = this.DATA_cards_target[first]
+    this.DATA_cards_target[first] = this.DATA_cards_target[second]
+    this.DATA_cards_target[second] = temp
+    temp = this.DATA_cards_time_limit[first]
+    this.DATA_cards_time_limit[first] = this.DATA_cards_time_limit[second]
+    this.DATA_cards_time_limit[second] = temp
+    temp = this.DATA_cards_start[first]
+    this.DATA_cards_start[first] = this.DATA_cards_start[second]
+    this.DATA_cards_start[second] = temp
+    temp = this.DATA_cards_end[first]
+    this.DATA_cards_end[first] = this.DATA_cards_end[second]
+    this.DATA_cards_end[second] = temp
+    temp = this.DATA_cards_done[first]
+    this.DATA_cards_done[first] = this.DATA_cards_done[second]
+    this.DATA_cards_done[second] = temp
+  }
+
+  move_card_to_index(from: number, to: number) {
+    let temp: string | number = ""
+    temp = this.DATA_cards_name.splice(from, 1)[0]
+    this.DATA_cards_name.splice(to, 0, temp)
+    temp = this.DATA_cards_desc.splice(from, 1)[0]
+    this.DATA_cards_desc.splice(to, 0, temp)
+    temp = this.DATA_cards_length.splice(from, 1)[0]
+    this.DATA_cards_length.splice(to, 0, temp)
+    temp = this.DATA_cards_target.splice(from, 1)[0]
+    this.DATA_cards_target.splice(to, 0, temp)
+    temp = this.DATA_cards_time_limit.splice(from, 1)[0]
+    this.DATA_cards_time_limit.splice(to, 0, temp)
+    temp = this.DATA_cards_start.splice(from, 1)[0]
+    this.DATA_cards_start.splice(to, 0, temp)
+    temp = this.DATA_cards_end.splice(from, 1)[0]
+    this.DATA_cards_end.splice(to, 0, temp)
+    temp = this.DATA_cards_done.splice(from, 1)[0]
+    this.DATA_cards_done.splice(to, 0, temp)
   }
 
   setSegmentButtonOptions() {
@@ -1603,7 +1755,7 @@ struct LinysBlock {
     .offset({ y: this.UI_y_offset })
     .opacity(this.UI_block_opacity)
     .animation({
-      delay: this.index > this.ENVIRONMENT_waterFlow_column_count * 2.5 ? 200 : this.UI_timeout + 300,
+      delay: this.index > this.ENVIRONMENT_waterFlow_column_count * 2.5 ? 200 : this.UI_timeout + 400,
       duration: 300,
       curve: Curve.ExtremeDeceleration
     })
