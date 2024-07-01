@@ -209,6 +209,10 @@
       "value": "来者犹可追"
     },
     {
+      "name": "Card_Progress_Desc_Already_Done",
+      "value": "＊已完成＊"
+    },
+    {
       "name": "Card_Progress_Title_Manage",
       "value": "管理"
     },
@@ -225,11 +229,11 @@
       "value": "需要先结束 \uDB80\uDC2B"
     },
     {
-      "name": "Work_Title_Ongoing_Nothing",
+      "name": "Work_Title_Work_Idle",
       "value": "无事"
     },
     {
-      "name": "Work_Title_Ongoing",
+      "name": "Work_Title_Work_Ongoing",
       "value": "已经进行"
     },
     {
@@ -245,7 +249,7 @@
       "value": "我将立刻开始 \uDB80\uDCB4"
     },
     {
-      "name": "Work_Start_Cannot_Since_Another_Ongoing",
+      "name": "Work_Start_Other_Ongoing",
       "value": "已经在进行中 \uDB80\uDC2B"
     }
   ]

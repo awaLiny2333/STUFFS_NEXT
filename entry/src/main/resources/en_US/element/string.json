@@ -209,6 +209,10 @@
       "value": "Never Too Late"
     },
     {
+      "name": "Card_Progress_Desc_Already_Done",
+      "value": "＊Already Done＊"
+    },
+    {
       "name": "Card_Progress_Title_Manage",
       "value": "Manage"
     },
@@ -225,11 +229,11 @@
       "value": "Stop This Card First \uDB80\uDC2B"
     },
     {
-      "name": "Work_Title_Ongoing_Nothing",
+      "name": "Work_Title_Work_Idle",
       "value": "Nothing"
     },
     {
-      "name": "Work_Title_Ongoing",
+      "name": "Work_Title_Work_Ongoing",
       "value": "Already Done"
     },
     {
@@ -245,7 +249,7 @@
       "value": "I Will Start NOW \uDB80\uDCB4"
     },
     {
-      "name": "Work_Start_Cannot_Since_Another_Ongoing",
+      "name": "Work_Start_Other_Ongoing",
       "value": "Task Ongoing \uDB80\uDC2B"
     }
   ]
