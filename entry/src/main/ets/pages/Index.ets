@@ -1,9 +1,9 @@
 import display from '@ohos.display';
 import { SegmentButton, SegmentButtonOptions } from '@ohos.arkui.advanced.SegmentButton';
 import { ConfigurationConstant } from '@kit.AbilityKit';
-import KVManagerTools from '../blocks/KVManagerTools';
+import KVManagerTools from '../tools/KVManagerTools';
 import { systemDateTime } from '@kit.BasicServicesKit';
-import PreferencesTools from '../blocks/PreferencesTools';
+import PreferencesTools from '../tools/PreferencesTools';
 
 @Entry
 @Component
@@ -47,13 +47,11 @@ struct Index {
   @State @Watch('onChangeBackground') UI_backdrop_choose: number[] = [0]
   // if UI_backdrop_choose == [0] then use Pure Color as background
   @State UI_backdrop_segment_button_options: SegmentButtonOptions = SegmentButtonOptions.tab({
-    buttons: [
-      { text: $r("app.string.Settings_Content_Background_Color") },
+    buttons: [{ text: $r("app.string.Settings_Content_Background_Color") },
       { text: $r("app.string.Settings_Content_Background_Image") }],
     fontColor: this.DESIGN_font_color,
     selectedFontColor: this.DESIGN_block_background_color,
-    fontWeight: FontWeight.Medium,
-    // backgroundColor: this.Color_scheme[0],
+    fontWeight: FontWeight.Medium, // backgroundColor: this.Color_scheme[0],
     selectedFontWeight: FontWeight.Bolder,
     selectedBackgroundColor: this.DESIGN_font_color
   })
@@ -95,8 +93,7 @@ struct Index {
     console.log("OKK")
     PreferencesTools.getValueOfKey("meow").then((result) => {
       if (result == "no") {
-        console.log("welcome first run")
-        // First open app then put
+        console.log("welcome first run") // First open app then put
         PreferencesTools.putValueOfKey("meow", "meow")
         KVManagerTools.putValueOfKey("use_backdrop", "false")
         KVManagerTools.putValueOfKey("color_scheme_light", this.DESIGN_color_scheme_light_default)
@@ -105,11 +102,10 @@ struct Index {
         KVManagerTools.putValueOfKey("Min_block_size", this.DESIGN_min_card_size.toString())
         KVManagerTools.putValueOfKey("APP_open_time", this.DATA_app_open_time.toString())
 
-        this.storeWorkingState()
-        this.storeCards()
+        this.WORK_storeWorkingState()
+        this.CARD_storeCards()
 
-      } else {
-        // Used before then directly load
+      } else { // Used before then directly load
         let temp: string[] = []
         this.UI_is_first_open = false
         KVManagerTools.getValueOfKey("cards_name").then((result) => {
@@ -191,9 +187,8 @@ struct Index {
           this.DATA_work_last_end = Number(result as string)
         })
       }
-      this.readDesign()
-    })
-    // load KVStore
+      this.DESIGN_read_design()
+    }) // load KVStore
     this.DATA_app_open_time += 1
   }
 
@@ -207,8 +202,8 @@ struct Index {
   build() {
     RelativeContainer() {
       Image($r("app.media.bg1"))
-        .width(this.isNotViewingDetail() ? "100%" : this.ENVIRONMENT_screen_width * 1.1)
-        .height(this.isNotViewingDetail() ? "100%" : this.ENVIRONMENT_screen_height * 1.1)
+        .width(this.DETAILS_is_not_viewing_detail() ? "100%" : this.ENVIRONMENT_screen_width * 1.1)
+        .height(this.DETAILS_is_not_viewing_detail() ? "100%" : this.ENVIRONMENT_screen_height * 1.1)
         .animation({ delay: 30, duration: 800, curve: Curve.ExtremeDeceleration })
         .alignRules({
           center: { anchor: "__container__", align: VerticalAlign.Center },
@@ -221,11 +216,9 @@ struct Index {
       }
       .height("100%")
       .width("100%")
-      .backgroundColor(this.UI_start_up_cover_continue_opacity != 0 ?
-      $r('app.color.start_window_background') :
-        (this.DESIGN_use_backdrop ? this.DESIGN_color_scheme[0] : this.DESIGN_color_scheme[1])
-      )
-      .animation(this.animateParam(0))
+      .backgroundColor(this.UI_start_up_cover_continue_opacity != 0 ? $r('app.color.start_window_background') :
+        (this.DESIGN_use_backdrop ? this.DESIGN_color_scheme[0] : this.DESIGN_color_scheme[1]))
+      .animation(this.DESIGN_animateParam(0))
 
       // Backdrop Cover
 
@@ -237,13 +230,13 @@ struct Index {
             .fontWeight(FontWeight.Bolder)
             .position({ y: this.UI_Title_y_offset })
             .opacity(this.UI_Title_opacity)
-            .animation(this.animateParam(200))
+            .animation(this.DESIGN_animateParam(200))
             .onAreaChange(() => {
               this.UI_Title_opacity = 100
               this.UI_Title_y_offset = 0
             })
             .fontColor(this.DESIGN_font_color)
-            .animation(this.animateParam(0))
+            .animation(this.DESIGN_animateParam(0))
 
           Text($r("app.string.Entry_Subtitle"))
             .fontSize(20 * this.UI_Title_font_zoom)
@@ -251,17 +244,17 @@ struct Index {
             .margin({ top: 65 * this.UI_Title_font_zoom })
             .position({ y: this.UI_subTitle_y_offset })
             .opacity(this.UI_subTitle_opacity)
-            .animation(this.animateParam(300))
+            .animation(this.DESIGN_animateParam(300))
             .onAreaChange(() => {
               this.UI_subTitle_y_offset = 0
               this.UI_subTitle_opacity = 100
             })
             .fontColor(this.DESIGN_font_color)
-            .animation(this.animateParam(0))
+            .animation(this.DESIGN_animateParam(0))
         }
         .position({ y: this.UI_Title_top_margin + 20 })
         .width("100%")
-        .animation(this.animateParam(0))
+        .animation(this.DESIGN_animateParam(0))
         .padding({ left: 20 })
 
         // BIG TITLE ("STUFFS")
@@ -279,8 +272,7 @@ struct Index {
                 .fontSize(25)
                 .fontWeight(FontWeight.Bolder)
                 .position({ x: 20, y: 20 })
-                .fontColor(this.DESIGN_font_color)
-              // TITLE GREETINGS
+                .fontColor(this.DESIGN_font_color) // TITLE GREETINGS
 
               Row() {
                 LinysSymbolButton({
@@ -289,21 +281,19 @@ struct Index {
                   DESIGN_font_color: this.DESIGN_font_color,
                   STATUS_trigger: this.STATUS_top_card_add_is_open,
                   STATUS_switch_to_arrow: this.STATUS_top_card_add_is_open,
+                }).onClick(() => {
+                  this.SETTINGS_reset_design_confirm = 0
+                  this.STATUS_top_card_settings_is_open = false
+                  this.ADD_name = ""
+                  this.ADD_description = ""
+                  if (this.STATUS_top_card_add_is_open) {
+                    this.UI_top_card_height = 170
+                    this.STATUS_top_card_add_is_open = false
+                  } else {
+                    this.UI_top_card_height = 845
+                    this.STATUS_top_card_add_is_open = true // ADD LENGTH
+                  }
                 })
-                  .onClick(() => {
-                    this.SETTINGS_reset_design_confirm = 0
-                    this.STATUS_top_card_settings_is_open = false
-                    this.ADD_name = ""
-                    this.ADD_description = ""
-                    if (this.STATUS_top_card_add_is_open) {
-                      this.UI_top_card_height = 170
-                      this.STATUS_top_card_add_is_open = false
-                    } else {
-                      this.UI_top_card_height = 845
-                      this.STATUS_top_card_add_is_open = true
-                      // ADD LENGTH
-                    }
-                  })
 
                 LinysSymbolButton({
                   UI_image: $r('sys.symbol.gearshape'),
@@ -311,31 +301,26 @@ struct Index {
                   DESIGN_font_color: this.DESIGN_font_color,
                   STATUS_trigger: this.STATUS_top_card_settings_is_open,
                   STATUS_switch_to_arrow: this.STATUS_top_card_settings_is_open,
+                }).onClick(() => {
+                  this.SETTINGS_reset_design_confirm = 0
+                  this.STATUS_top_card_add_is_open = false
+                  if (this.STATUS_top_card_settings_is_open) {
+                    this.UI_top_card_height = 170
+                    this.STATUS_top_card_settings_is_open = false
+                  } else {
+                    this.UI_top_card_height = 1030
+                    this.STATUS_top_card_settings_is_open = true // SETTINGS LENGTH
+                  }
                 })
-                  .onClick(() => {
-                    this.SETTINGS_reset_design_confirm = 0
-                    this.STATUS_top_card_add_is_open = false
-                    if (this.STATUS_top_card_settings_is_open) {
-                      this.UI_top_card_height = 170
-                      this.STATUS_top_card_settings_is_open = false
-                    } else {
-                      this.UI_top_card_height = 1030
-                      this.STATUS_top_card_settings_is_open = true
-                      // SETTINGS LENGTH
-                    }
-                  })
-              }
-              .padding({ left: 10, right: 10 })
-              .position({ y: 60 })
+              }.padding({ left: 10, right: 10 }).position({ y: 60 })
 
               // Block Head Buttons
 
-              Column({ space: 10 }) {
-                // Settings
+              Column({ space: 10 }) { // Settings
                 Text($r("app.string.Settings_block_Settings"))
                   .offset({ y: this.STATUS_top_card_settings_is_open ? 0 : 50 })
                   .visibility(this.STATUS_top_card_settings_is_open ? Visibility.Visible : Visibility.Hidden)
-                  .animation(this.animateParam(this.STATUS_top_card_settings_is_open ? 50 : 0))
+                  .animation(this.DESIGN_animateParam(this.STATUS_top_card_settings_is_open ? 50 : 0))
                   .fontColor(this.DESIGN_font_color)
                   .fontSize(25)
                   .fontWeight(FontWeight.Bold)
@@ -348,12 +333,11 @@ struct Index {
                 })
 
                 SegmentButton({
-                  options: this.UI_backdrop_segment_button_options,
-                  selectedIndexes: $UI_backdrop_choose
+                  options: this.UI_backdrop_segment_button_options, selectedIndexes: $UI_backdrop_choose
                 })
                   .offset({ y: this.STATUS_top_card_settings_is_open ? 0 : 50 })
                   .visibility(this.STATUS_top_card_settings_is_open ? Visibility.Visible : Visibility.Hidden)
-                  .animation(this.animateParam(this.STATUS_top_card_settings_is_open ? 150 : 0))
+                  .animation(this.DESIGN_animateParam(this.STATUS_top_card_settings_is_open ? 150 : 0))
 
                 LinysLeftTitle({
                   UI_text: $r("app.string.Settings_Content_Blur_Radius"),
@@ -376,7 +360,7 @@ struct Index {
                   })
                   .offset({ y: this.STATUS_top_card_settings_is_open ? 0 : 50 })
                   .visibility(this.STATUS_top_card_settings_is_open ? Visibility.Visible : Visibility.Hidden)
-                  .animation(this.animateParam(this.STATUS_top_card_settings_is_open ? 250 : 0))
+                  .animation(this.DESIGN_animateParam(this.STATUS_top_card_settings_is_open ? 250 : 0))
                   .blockColor(this.DESIGN_block_background_color)
                   .selectedColor(this.DESIGN_font_color)
 
@@ -397,12 +381,12 @@ struct Index {
                     if (mode == SliderChangeMode.End || mode == SliderChangeMode.Click) {
                       this.DESIGN_min_card_size = value
                       KVManagerTools.putValueOfKey("Min_block_size", this.DESIGN_min_card_size.toString())
-                      this.setWaterFlowLayout()
+                      this.UI_set_waterFlow_layout()
                     }
                   })
                   .offset({ y: this.STATUS_top_card_settings_is_open ? 0 : 50 })
                   .visibility(this.STATUS_top_card_settings_is_open ? Visibility.Visible : Visibility.Hidden)
-                  .animation(this.animateParam(this.STATUS_top_card_settings_is_open ? 350 : 0))
+                  .animation(this.DESIGN_animateParam(this.STATUS_top_card_settings_is_open ? 350 : 0))
                   .blockColor(this.DESIGN_block_background_color)
                   .selectedColor(this.DESIGN_font_color)
 
@@ -432,7 +416,7 @@ struct Index {
                   .textOverflow(TextOverflow.Ellipsis)
                   .offset({ y: this.STATUS_top_card_settings_is_open ? 0 : 50 })
                   .visibility(this.STATUS_top_card_settings_is_open ? Visibility.Visible : Visibility.Hidden)
-                  .animation(this.animateParam(this.STATUS_top_card_settings_is_open ? 500 : 0))
+                  .animation(this.DESIGN_animateParam(this.STATUS_top_card_settings_is_open ? 500 : 0))
                   .fontColor(this.DESIGN_font_color)
 
                 LinysLeftTitle({
@@ -443,8 +427,7 @@ struct Index {
                 })
 
                 TextArea({
-                  placeholder: this.DESIGN_color_scheme_dark.toString(),
-                  text: this.DESIGN_color_scheme_dark.toString()
+                  placeholder: this.DESIGN_color_scheme_dark.toString(), text: this.DESIGN_color_scheme_dark.toString()
                 })
                   .onChange((value) => {
                     this.SETTINGS_color_scheme_edit_dark = value
@@ -453,7 +436,7 @@ struct Index {
                   .textOverflow(TextOverflow.Ellipsis)
                   .offset({ y: this.STATUS_top_card_settings_is_open ? 0 : 50 })
                   .visibility(this.STATUS_top_card_settings_is_open ? Visibility.Visible : Visibility.Hidden)
-                  .animation(this.animateParam(this.STATUS_top_card_settings_is_open ? 600 : 0))
+                  .animation(this.DESIGN_animateParam(this.STATUS_top_card_settings_is_open ? 600 : 0))
                   .fontColor(this.DESIGN_font_color)
 
                 LinysRightExplanation({
@@ -474,7 +457,7 @@ struct Index {
                 .padding(5)
                 .backgroundColor(this.DESIGN_font_color)
                 .onClick(() => {
-                  this.setWaterFlowLayout()
+                  this.UI_set_waterFlow_layout()
 
                   KVManagerTools.putValueOfKey("Min_block_size", this.DESIGN_min_card_size.toString())
 
@@ -484,12 +467,12 @@ struct Index {
                   if (this.SETTINGS_color_scheme_edit_dark != "") {
                     this.DESIGN_color_scheme_dark = this.SETTINGS_color_scheme_edit_dark.split(",")
                   }
-                  this.updateKeyColors()
-                  this.storeCurrentDesign()
+                  this.DESIGN_update_key_colors()
+                  this.DESIGN_store_current_design()
                 })
                 .offset({ y: this.STATUS_top_card_settings_is_open ? 0 : 50 })
                 .visibility(this.STATUS_top_card_settings_is_open ? Visibility.Visible : Visibility.Hidden)
-                .animation(this.animateParam(this.STATUS_top_card_settings_is_open ? 700 : 0))
+                .animation(this.DESIGN_animateParam(this.STATUS_top_card_settings_is_open ? 700 : 0))
                 .clickEffect({ level: ClickEffectLevel.LIGHT })
 
                 LinysRightExplanation({
@@ -501,8 +484,8 @@ struct Index {
                 })
 
                 Button() {
-                  Text(this.SETTINGS_reset_design_confirm == 0 ?
-                  $r("app.string.General_RESET") : $r('app.string.General_One_More_Confirm'))
+                  Text(this.SETTINGS_reset_design_confirm == 0 ? $r("app.string.General_RESET") :
+                  $r('app.string.General_One_More_Confirm'))
                     .fontSize(15)
                     .fontColor(this.SETTINGS_reset_design_confirm == 0 ? this.DESIGN_block_background_color :
                     this.DESIGN_font_color)
@@ -512,13 +495,12 @@ struct Index {
                 .padding(5)
                 .backgroundColor(this.SETTINGS_reset_design_confirm == 0 ? this.DESIGN_font_color :
                 this.DESIGN_block_background_color)
-                .animation(this.animateParam(0))
+                .animation(this.DESIGN_animateParam(0))
                 .clickEffect({ level: ClickEffectLevel.LIGHT })
                 .offset({ y: this.STATUS_top_card_settings_is_open ? 0 : 50 })
                 .visibility(this.STATUS_top_card_settings_is_open ? Visibility.Visible : Visibility.Hidden)
-                .animation(this.animateParam(this.STATUS_top_card_settings_is_open ? 800 : 0))
-                .onClick(() => {
-                  // RESET SCHEME
+                .animation(this.DESIGN_animateParam(this.STATUS_top_card_settings_is_open ? 800 : 0))
+                .onClick(() => { // RESET SCHEME
                   if (this.SETTINGS_reset_design_confirm == 0) {
                     this.SETTINGS_reset_design_confirm = 1
                   } else if (this.SETTINGS_reset_design_confirm == 1) {
@@ -528,9 +510,9 @@ struct Index {
                     this.DESIGN_color_scheme_dark = this.DESIGN_color_scheme_dark_default.split(",")
                     this.DESIGN_min_card_size = 450
                     this.DESIGN_cards_blur_radius = 25
-                    this.updateKeyColors()
-                    this.storeCurrentDesign()
-                    this.setWaterFlowLayout()
+                    this.DESIGN_update_key_colors()
+                    this.DESIGN_store_current_design()
+                    this.UI_set_waterFlow_layout()
                   }
                 })
               }
@@ -538,7 +520,7 @@ struct Index {
               .padding({ left: 20, right: 20 })
               .position({ y: 165 })
               .visibility(this.STATUS_top_card_settings_is_open ? Visibility.Visible : Visibility.None)
-              .animation(this.animateParam(0))
+              .animation(this.DESIGN_animateParam(0))
 
               // Settings Content
 
@@ -549,7 +531,7 @@ struct Index {
                   .fontWeight(FontWeight.Bold)
                   .offset({ y: this.STATUS_top_card_add_is_open ? 0 : 50 })
                   .visibility(this.STATUS_top_card_add_is_open ? Visibility.Visible : Visibility.Hidden)
-                  .animation(this.animateParam(this.STATUS_top_card_add_is_open ? 50 : 0))
+                  .animation(this.DESIGN_animateParam(this.STATUS_top_card_add_is_open ? 50 : 0))
 
                 LinysLeftTitle({
                   UI_text: $r("app.string.Add_Name_Title"),
@@ -600,7 +582,7 @@ struct Index {
                   .selectedColor(this.DESIGN_font_color)
                   .offset({ y: this.STATUS_top_card_add_is_open ? 0 : 50 })
                   .visibility(this.STATUS_top_card_add_is_open ? Visibility.Visible : Visibility.Hidden)
-                  .animation(this.animateParam(this.STATUS_top_card_add_is_open ? 350 : 0))
+                  .animation(this.DESIGN_animateParam(this.STATUS_top_card_add_is_open ? 350 : 0))
                   .onChange((value: number, _mode: SliderChangeMode) => {
                     this.ADD_length = value
                     if (value < 270) {
@@ -637,7 +619,7 @@ struct Index {
                   .selectedColor(this.DESIGN_font_color)
                   .offset({ y: this.STATUS_top_card_add_is_open ? 0 : 50 })
                   .visibility(this.STATUS_top_card_add_is_open ? Visibility.Visible : Visibility.Hidden)
-                  .animation(this.animateParam(this.STATUS_top_card_add_is_open ? 500 : 0))
+                  .animation(this.DESIGN_animateParam(this.STATUS_top_card_add_is_open ? 500 : 0))
                   .onChange((value: number, _mode: SliderChangeMode) => {
                     this.ADD_time_limit = Math.round(value)
                     this.ADD_time_limit_unit_or_description = "app.string.Add_Day"
@@ -661,9 +643,9 @@ struct Index {
                       }
                     })
                     .offset({ y: this.STATUS_top_card_add_is_open ? 0 : 50 })
-                    .animation(this.animateParam(550))
-                    .visibility(this.STATUS_top_card_add_is_open && this.ADD_time_limit != 367 ?
-                    Visibility.Visible : Visibility.Hidden)
+                    .animation(this.DESIGN_animateParam(550))
+                    .visibility(this.STATUS_top_card_add_is_open && this.ADD_time_limit != 367 ? Visibility.Visible :
+                    Visibility.Hidden)
                     .layoutWeight(1)
                     .fontSize(15)
                     .fontWeight(FontWeight.Regular)
@@ -672,7 +654,7 @@ struct Index {
                   Text($r(this.ADD_time_limit_unit_or_description))
                     .offset({ y: this.STATUS_top_card_add_is_open ? 0 : 50 })
                     .visibility(this.STATUS_top_card_add_is_open ? Visibility.Visible : Visibility.Hidden)
-                    .animation(this.animateParam(550))
+                    .animation(this.DESIGN_animateParam(550))
                     .fontSize(15)
                     .fontColor(this.DESIGN_font_color)
                     .fontWeight(FontWeight.Regular)
@@ -698,7 +680,7 @@ struct Index {
                 })
                   .offset({ y: this.STATUS_top_card_add_is_open ? 0 : 50 })
                   .visibility(this.STATUS_top_card_add_is_open ? Visibility.Visible : Visibility.Hidden)
-                  .animation(this.animateParam(this.STATUS_top_card_add_is_open ? 650 : 0))
+                  .animation(this.DESIGN_animateParam(this.STATUS_top_card_add_is_open ? 650 : 0))
                   .onChange((value: number, _mode: SliderChangeMode) => {
                     this.ADD_value_target = Math.round(value)
                     this.ADD_value_target_unit_or_description = "app.string.Add_Value_Unit_Hour"
@@ -724,9 +706,9 @@ struct Index {
                       }
                     })
                     .offset({ y: this.STATUS_top_card_add_is_open ? 0 : 50 })
-                    .animation(this.animateParam(700))
-                    .visibility(this.STATUS_top_card_add_is_open && this.ADD_value_target != 1001 ?
-                    Visibility.Visible : Visibility.Hidden)
+                    .animation(this.DESIGN_animateParam(700))
+                    .visibility(this.STATUS_top_card_add_is_open && this.ADD_value_target != 1001 ? Visibility.Visible :
+                    Visibility.Hidden)
                     .fontSize(15)
                     .fontWeight(FontWeight.Regular)
                     .fontColor(this.DESIGN_font_color)
@@ -735,7 +717,7 @@ struct Index {
                   Text($r(this.ADD_value_target_unit_or_description))
                     .offset({ y: this.STATUS_top_card_add_is_open ? 0 : 50 })
                     .visibility(this.STATUS_top_card_add_is_open ? Visibility.Visible : Visibility.Hidden)
-                    .animation(this.animateParam(750))
+                    .animation(this.DESIGN_animateParam(750))
                     .fontSize(15)
                     .fontColor(this.DESIGN_font_color)
                     .fontWeight(FontWeight.Regular)
@@ -751,51 +733,25 @@ struct Index {
                     .fontSize(15)
                     .fontColor(this.DESIGN_block_background_color)
                     .fontWeight(FontWeight.Bolder)
-                    .animation(this.animateParam(0))
+                    .animation(this.DESIGN_animateParam(0))
                 }
                 .offset({ y: this.STATUS_top_card_add_is_open ? 0 : 50 })
                 .visibility(this.STATUS_top_card_add_is_open ? Visibility.Visible : Visibility.Hidden)
-                .animation(this.animateParam(this.STATUS_top_card_add_is_open ? 400 : 0))
+                .animation(this.DESIGN_animateParam(this.STATUS_top_card_add_is_open ? 400 : 0))
                 .clickEffect({ level: ClickEffectLevel.LIGHT })
                 .width("100%")
                 .padding(5)
                 .backgroundColor(this.DESIGN_font_color)
                 .onClick(() => {
-                  if (this.ADD_name != "") {
-                    // Save Card and Add
+                  this.CARD_add_card()
 
-                    if (this.DATA_cards_name.includes(this.ADD_name)) {
-                      // Name crash
-                    } else {
-                      this.DATA_cards_name.push(this.ADD_name)
-                      if (this.ADD_description == "") {
-                        console.log("empty desc")
-                        this.DATA_cards_desc.push("喵 meow")
-                      } else {
-                        this.DATA_cards_desc.push(this.ADD_description)
-                      }
-                      this.DATA_cards_length.push(this.ADD_length)
-                      this.DATA_cards_time_limit.push(this.ADD_time_limit)
-                      this.DATA_cards_target.push(this.ADD_value_target)
-                      this.DATA_cards_done.push(0)
-                      this.DATA_cards_start.push(systemDateTime.getTime())
-                      this.DATA_cards_end.push(systemDateTime.getTime() + 86400000 * this.ADD_time_limit)
-                      this.storeCards()
-
-                      this.ADD_name = ""
-                      this.ADD_description = ""
-                    }
-                  } else {
-
-                  }
                 })
-
               }
               .alignItems(HorizontalAlign.Start)
               .padding({ left: 20, right: 20 })
               .position({ y: 165 })
               .visibility(this.STATUS_top_card_add_is_open ? Visibility.Visible : Visibility.None)
-              .animation(this.animateParam(0))
+              .animation(this.DESIGN_animateParam(0))
 
               // Add Content
 
@@ -810,14 +766,15 @@ struct Index {
             color: this.DESIGN_block_background_color
           })
           .backgroundColor(this.DESIGN_use_backdrop ? "#00000000" : this.DESIGN_color_scheme[5])
-          .animation(this.animateParam(0))
+          .animation(this.DESIGN_animateParam(0))
 
           // SETTINGS AND ADD BLOCK
 
           FlowItem() {
             RelativeContainer() {
               Column({ space: 5 }) {
-                Text(this.isWorkOnIdle() ? $r("app.string.Work_Title_Work_Idle") : this.DATA_work_working_card_name)
+                Text(this.WORK_is_work_on_idle() ? $r("app.string.Work_Title_Work_Idle") :
+                this.DATA_work_working_card_name)
                   .fontSize(25)
                   .fontWeight(FontWeight.Bold)
                   .fontColor(this.DESIGN_font_color)
@@ -827,11 +784,9 @@ struct Index {
                   .fontWeight(FontWeight.Bold)
                   .fontColor(this.DESIGN_font_color)
                   .width("100%")
-                Text(
-                  this.isWorkOnIdle() ?
-                  ((systemDateTime.getTime() - this.DATA_work_last_end) / 1000 / 3600).toFixed(2).toString() :
-                  ((systemDateTime.getTime() - this.DATA_work_start) / 1000 / 3600).toFixed(2).toString()
-                )
+                Text(this.WORK_is_work_on_idle() ?
+                ((systemDateTime.getTime() - this.DATA_work_last_end) / 1000 / 3600).toFixed(2).toString() :
+                ((systemDateTime.getTime() - this.DATA_work_start) / 1000 / 3600).toFixed(2).toString())
                   .maxLines(1)
                   .fontSize(60)
                   .fontWeight(FontWeight.Bold)
@@ -842,21 +797,20 @@ struct Index {
                   .fontWeight(FontWeight.Normal)
                   .fontColor(this.DESIGN_font_color)
                   .width("100%")
-              }
-              .alignItems(HorizontalAlign.Start)
-              .height("100%")
+              }.alignItems(HorizontalAlign.Start).height("100%")
 
               Button() {
                 Column() {
-                  SymbolGlyph(this.isWorkOnIdle() ? $r("sys.symbol.battery_75percent") : $r("sys.symbol.checkmark"))
+                  SymbolGlyph(this.WORK_is_work_on_idle() ? $r("sys.symbol.battery_75percent") :
+                  $r("sys.symbol.checkmark"))
                     .fontSize(45)
                     .fontColor([this.DESIGN_font_color])
-                    .symbolEffect(new ReplaceSymbolEffect(EffectScope.WHOLE), this.isWorkOnIdle())
-                  Text(this.isWorkOnIdle() ? $r("app.string.Work_Title_Not_Working") : $r('app.string.Work_Title_OK'))
+                    .symbolEffect(new ReplaceSymbolEffect(EffectScope.WHOLE), this.WORK_is_work_on_idle())
+                  Text(this.WORK_is_work_on_idle() ? $r("app.string.Work_Title_Not_Working") :
+                  $r('app.string.Work_Title_OK'))
                     .fontSize(16)
                     .fontColor(this.DESIGN_font_color)
-                }
-                .alignItems(HorizontalAlign.Center)
+                }.alignItems(HorizontalAlign.Center)
               }
               .type(ButtonType.Normal)
               .borderRadius(16)
@@ -867,13 +821,9 @@ struct Index {
               .backgroundColor("#00000000")
               .padding(10)
               .onClick(() => {
-                this.endCard()
+                this.WORK_end_card()
               })
-            }
-            .width("100%")
-            .height("100%")
-            .align(Alignment.TopStart)
-            .padding(20)
+            }.width("100%").height("100%").align(Alignment.TopStart).padding(20)
           }
           .height(300)
           .width("100%")
@@ -886,7 +836,7 @@ struct Index {
           .backgroundColor(this.DESIGN_use_backdrop ? "#00000000" : this.DESIGN_color_scheme[5])
           .opacity(this.UI_status_card_opacity)
           .offset({ y: this.UI_status_card_offset })
-          .animation(this.animateParam(0))
+          .animation(this.DESIGN_animateParam(0))
 
           // WORKING STATUS
 
@@ -936,9 +886,7 @@ struct Index {
                 })
                 .offset({ y: -40 })
             }.height("100%")
-          }
-          .animation(this.animateParam(0))
-          .height(this.ENVIRONMENT_screen_height)
+          }.animation(this.DESIGN_animateParam(0)).height(this.ENVIRONMENT_screen_height)
 
           // ENCOURAGEMENT
 
@@ -967,11 +915,11 @@ struct Index {
             this.UI_Title_font_zoom = 0.7
           }
         })
-        .animation(this.animateParam(400))
+        .animation(this.DESIGN_animateParam(400))
 
         .columnsTemplate(this.UI_waterFlow_Layout)
         .rowsGap(10)
-        .animation(this.animateParam(0))
+        .animation(this.DESIGN_animateParam(0))
 
         .onClick(() => {
           if (this.STATUS_card_expanding != -1) {
@@ -986,7 +934,7 @@ struct Index {
           Column() {
             Row() {
             }
-            .height(this.isNotViewingDetail() ? this.ENVIRONMENT_screen_height * 1 :
+            .height(this.DETAILS_is_not_viewing_detail() ? this.ENVIRONMENT_screen_height * 1 :
               this.ENVIRONMENT_screen_height * 0.25)
             .animation({ delay: 50, duration: 350, curve: Curve.ExtremeDeceleration })
             .onAreaChange(() => {
@@ -1009,11 +957,10 @@ struct Index {
                     .maxLines(1)
                     .textAlign(TextAlign.Start)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
-                    .offset({ y: this.isNotViewingDetail() ? 100 : 0 })
-                    .visibility(this.isNotViewingDetail() ? Visibility.Hidden : Visibility.Visible)
-                    .animation(this.animateParam(this.isNotViewingDetail() ? 0 : 150))
-                    .width("100%")
-                  // TITLE
+                    .offset({ y: this.DETAILS_is_not_viewing_detail() ? 100 : 0 })
+                    .visibility(this.DETAILS_is_not_viewing_detail() ? Visibility.Hidden : Visibility.Visible)
+                    .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 150))
+                    .width("100%") // TITLE
 
                   Row() {
                     Text(this.DATA_cards_done[this.STATUS_card_index_of_last_expanded] != undefined ?
@@ -1021,8 +968,8 @@ struct Index {
                       .fontSize(50)
                       .fontColor(this.DESIGN_font_color)
                       .fontWeight(FontWeight.Bold)
-                    Text("／" + (this.DATA_cards_target[this.STATUS_card_expanding] == 1001 ?
-                      " ∞ " : String(this.DATA_cards_target[this.STATUS_card_expanding])))
+                    Text("／" + (this.DATA_cards_target[this.STATUS_card_expanding] == 1001 ? " ∞ " :
+                    String(this.DATA_cards_target[this.STATUS_card_expanding])))
                       .fontSize(16)
                       .fontColor(this.DESIGN_font_color)
                       .fontWeight(FontWeight.Medium)
@@ -1031,9 +978,9 @@ struct Index {
                       .fontColor(this.DESIGN_font_color)
                       .fontWeight(FontWeight.Medium)
                   }
-                  .offset({ y: (this.isNotViewingDetail()) ? 100 : 0 })
-                  .visibility((this.isNotViewingDetail()) ? Visibility.Hidden : Visibility.Visible)
-                  .animation(this.animateParam(this.isNotViewingDetail() ? 0 : 200))
+                  .offset({ y: (this.DETAILS_is_not_viewing_detail()) ? 100 : 0 })
+                  .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
+                  .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 200))
                   .alignItems(VerticalAlign.Bottom)
                   .margin({ bottom: 14 })
                   .width("100%")
@@ -1046,29 +993,25 @@ struct Index {
                     .maxLines(3)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .fontColor(this.DESIGN_font_color)
-                    .offset({ y: (this.isNotViewingDetail()) ? 100 : 0 })
-                    .visibility((this.isNotViewingDetail()) ? Visibility.Hidden : Visibility.Visible)
-                    .animation(this.animateParam(250))
+                    .offset({ y: (this.DETAILS_is_not_viewing_detail()) ? 100 : 0 })
+                    .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
+                    .animation(this.DESIGN_animateParam(250))
                     .width("100%")
-                }
-                .width("100%")
-                .height("100%")
-              }
-              .width("100%")
-              .height(190)
+                }.width("100%").height("100%")
+              }.width("100%").height(190)
 
               // BASIC INFO
 
               FlowItem() {
                 Column() {
                   Gauge({
-                    value: this.getDoneGaugeValue(),
+                    value: this.CARD_get_done_value(),
                     min: 0,
                     max: this.DATA_cards_target[this.STATUS_card_index_of_last_expanded] == 1001 ? 999 :
                     this.DATA_cards_target[this.STATUS_card_index_of_last_expanded]
                   }) {
                     Column() {
-                      Text(this.getDonePercentage())
+                      Text(this.CARD_get_done_percentage())
                         .fontWeight(FontWeight.Medium)
                         .fontSize(20)
                         .fontColor(this.DESIGN_font_color)
@@ -1083,38 +1026,32 @@ struct Index {
                         .textAlign(TextAlign.Center)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                         .maxLines(1)
-                    }
-                    .height("100%")
+                    }.height("100%")
                   }
                   .startAngle(225)
                   .endAngle(135)
-                  .colors(new LinearGradient([
-                    { color: "#D0e84026", offset: 0 },
-                    { color: "#D0f7ce00", offset: 0.6 },
-                    { color: "#D064bb5c", offset: 1 }
-                  ]))
+                  .colors(new LinearGradient([{ color: "#D0e84026", offset: 0 }, { color: "#D0f7ce00", offset: 0.6 },
+                    { color: "#D064bb5c", offset: 1 }]))
                   .strokeWidth(18)
                   .trackShadow({ radius: 7, offsetX: -7, offsetY: 7 })
                   .height(180)
                 }
-                .offset({ y: (this.isNotViewingDetail()) ? 100 : 10 })
-                .visibility(this.isNotViewingDetail() ? Visibility.Hidden : Visibility.Visible)
-                .alignItems(this.isWideScreen() ? HorizontalAlign.End : HorizontalAlign.Center)
-                .animation(this.animateParam(this.isNotViewingDetail() ? 0 : 350))
+                .offset({ y: (this.DETAILS_is_not_viewing_detail()) ? 100 : 10 })
+                .visibility(this.DETAILS_is_not_viewing_detail() ? Visibility.Hidden : Visibility.Visible)
+                .alignItems(this.DETAILS_is_wide_screen() ? HorizontalAlign.End : HorizontalAlign.Center)
+                .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 350))
                 .width("100%")
                 .height("100%")
-              }
-              .width("100%")
-              .height(190)
+              }.width("100%").height(190)
 
               // DONE GRAPH
 
               FlowItem() {
                 Column() {
                   Text($r(this.UI_card_expanded_slogan_of_time))
-                    .offset({ y: (this.isNotViewingDetail()) ? 100 : 0 })
-                    .visibility((this.isNotViewingDetail()) ? Visibility.Hidden : Visibility.Visible)
-                    .animation(this.animateParam(this.isNotViewingDetail() ? 0 : 400))
+                    .offset({ y: (this.DETAILS_is_not_viewing_detail()) ? 100 : 0 })
+                    .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
+                    .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 400))
                     .fontSize(22)
                     .maxLines(1)
                     .fontColor(this.DESIGN_font_color)
@@ -1125,10 +1062,11 @@ struct Index {
                     value: this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded] == 367 ?
                       0.5 * this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded] + 1 :
                     this.UI_card_expanded_remaining_days,
-                    min: 0, max: this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded]
+                    min: 0,
+                    max: this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded]
                   }) {
                     Column() {
-                      Text(this.getTimeLeftPercentage())
+                      Text(this.CARD_get_time_left_percentage())
                         .fontWeight(FontWeight.Medium)
                         .fontSize(20)
                         .fontColor(this.DESIGN_font_color)
@@ -1143,12 +1081,11 @@ struct Index {
                         .textAlign(TextAlign.Center)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                         .maxLines(1)
-                    }
-                    .height("100%")
+                    }.height("100%")
                   }
-                  .offset({ y: (this.isNotViewingDetail()) ? 100 : 0 })
-                  .visibility((this.isNotViewingDetail()) ? Visibility.Hidden : Visibility.Visible)
-                  .animation(this.animateParam(this.isNotViewingDetail() ? 0 : 450))
+                  .offset({ y: (this.DETAILS_is_not_viewing_detail()) ? 100 : 0 })
+                  .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
+                  .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 450))
                   .indicator(null)
                   .startAngle(225)
                   .endAngle(135)
@@ -1156,23 +1093,17 @@ struct Index {
                   .strokeWidth(18)
                   .trackShadow({ radius: 7, offsetX: -7, offsetY: 7 })
                   .height(180)
-                }
-                .alignItems(HorizontalAlign.Center)
-                .width("100%")
-              }
-              .width("100%")
-              .height(this.isWideScreen() ? 270 : 200)
+                }.alignItems(HorizontalAlign.Center).width("100%")
+              }.width("100%").height(this.DETAILS_is_wide_screen() ? 270 : 200)
 
               // TIME LEFT GRAPH
 
               FlowItem() {
                 Column({ space: 5 }) {
-                  Text($r("app.string.Card_Progress_Desc_Estimating"))
-                    .fontSize(16)
-                    .fontColor(this.DESIGN_font_color)
+                  Text($r("app.string.Card_Progress_Desc_Estimating")).fontSize(16).fontColor(this.DESIGN_font_color)
 
                   Row() {
-                    Text(this.getNextEveryDay())
+                    Text(this.CARD_get_next_every_day_work())
                       .fontSize(40)
                       .fontColor(this.DESIGN_font_color)
                       .fontWeight(FontWeight.Bold)
@@ -1180,8 +1111,7 @@ struct Index {
                       .fontSize(16)
                       .fontColor(this.DESIGN_font_color)
                       .margin({ bottom: 6 })
-                  }
-                  .alignItems(VerticalAlign.Bottom)
+                  }.alignItems(VerticalAlign.Bottom)
 
                   Text($r('app.string.Card_Progress_Desc_Estimating_Hours'))
                     .fontSize(16)
@@ -1189,7 +1119,8 @@ struct Index {
                     .textAlign(TextAlign.Center)
 
                   Button() {
-                    Text(this.isWorkOnIdle() ? $r("app.string.Work_Start") : $r("app.string.Work_Start_Other_Ongoing"))
+                    Text(this.WORK_is_work_on_idle() ? $r("app.string.Work_Start") :
+                    $r("app.string.Work_Start_Other_Ongoing"))
                       .fontSize(15)
                       .fontColor(this.DESIGN_block_background_color)
                       .fontWeight(FontWeight.Bolder)
@@ -1201,10 +1132,10 @@ struct Index {
                   .margin({ top: 15 })
                   .backgroundColor(this.DESIGN_font_color)
                   .onClick(() => {
-                    if (this.isWorkOnIdle()) {
-                      this.startCard(this.DATA_cards_name[this.STATUS_card_expanding])
+                    if (this.WORK_is_work_on_idle()) {
+                      this.WORK_start_card(this.DATA_cards_name[this.STATUS_card_expanding])
                       this.STATUS_card_index_of_last_expanded = -2
-                      this.collapseCardDetail(true,true)
+                      this.CARD_collapse_card_detail(true, true)
                       this.STATUS_card_index_of_last_expanded = 0
                     }
                   })
@@ -1213,24 +1144,22 @@ struct Index {
 
                 }
                 .alignItems(HorizontalAlign.Center)
-                .offset({ y: (this.isNotViewingDetail()) ? 100 : 0 })
-                .visibility((this.isNotViewingDetail()) ? Visibility.Hidden : Visibility.Visible)
-                .animation(this.animateParam(this.isNotViewingDetail() ? 0 : 500))
+                .offset({ y: (this.DETAILS_is_not_viewing_detail()) ? 100 : 0 })
+                .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
+                .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 500))
                 .width("100%")
 
                 // PLAN ESTIMATED
-              }
-              .width("100%")
-              .height(this.isWideScreen() ? 270 : 240)
+              }.width("100%").height(this.DETAILS_is_wide_screen() ? 270 : 240)
 
               // EXPLANATION
 
               FlowItem() {
                 Column({ space: 10 }) {
                   Text($r("app.string.Settings_block_Settings"))
-                    .visibility((this.isNotViewingDetail()) ? Visibility.Hidden : Visibility.Visible)
+                    .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
                     .offset({ y: this.STATUS_card_expanding != -1 ? 0 : 50 })
-                    .animation(this.animateParam(550))
+                    .animation(this.DESIGN_animateParam(550))
                     .fontSize(22)
                     .maxLines(1)
                     .fontColor(this.DESIGN_font_color)
@@ -1245,15 +1174,10 @@ struct Index {
                   })
 
                   TextArea({
-                    placeholder: "=￣ω￣=",
-                    text: this.DATA_cards_name[this.STATUS_card_index_of_last_expanded]
-                  })
-                    .fontColor(this.DESIGN_font_color)
-                    .onChange((value) => {
-                      this.EDIT_name = value
-                    })
-                    .height(39)
-                    .textOverflow(TextOverflow.Ellipsis)
+                    placeholder: "=￣ω￣=", text: this.DATA_cards_name[this.STATUS_card_index_of_last_expanded]
+                  }).fontColor(this.DESIGN_font_color).onChange((value) => {
+                    this.EDIT_name = value
+                  }).height(39).textOverflow(TextOverflow.Ellipsis)
 
                   // CARD NAME
 
@@ -1265,15 +1189,10 @@ struct Index {
                   })
 
                   TextArea({
-                    placeholder: "(〃￣︶￣)人(￣︶￣〃)",
-                    text: this.DATA_cards_desc[this.STATUS_card_index_of_last_expanded]
-                  })
-                    .fontColor(this.DESIGN_font_color)
-                    .onChange((value) => {
-                      this.EDIT_description = value
-                    })
-                    .height(81)
-                    .textOverflow(TextOverflow.Ellipsis)
+                    placeholder: "(〃￣︶￣)人(￣︶￣〃)", text: this.DATA_cards_desc[this.STATUS_card_index_of_last_expanded]
+                  }).fontColor(this.DESIGN_font_color).onChange((value) => {
+                    this.EDIT_description = value
+                  }).height(81).textOverflow(TextOverflow.Ellipsis)
 
                   // CARD DESCRIPTION
 
@@ -1318,14 +1237,13 @@ struct Index {
                       .fontSize(15)
                       .fontColor(this.DESIGN_block_background_color)
                       .fontWeight(FontWeight.Bolder)
-                      .animation(this.animateParam(0))
+                      .animation(this.DESIGN_animateParam(0))
                   }
                   .clickEffect({ level: ClickEffectLevel.LIGHT })
                   .width("100%")
                   .padding(5)
                   .backgroundColor(this.DESIGN_font_color)
-                  .onClick(() => {
-                    // Save Card and Add
+                  .onClick(() => { // Save Card and Add
                     this.DATA_cards_name[this.STATUS_card_index_of_last_expanded] = this.EDIT_name
                     if (this.EDIT_description == "") {
                       console.log("empty desc")
@@ -1335,17 +1253,13 @@ struct Index {
                     }
                     this.DATA_cards_length[this.STATUS_card_index_of_last_expanded] = this.EDIT_length
 
-                    this.storeCards()
+                    this.CARD_storeCards()
 
                   })
 
                   // CONFIRM BUTTON
-                }
-                .alignItems(HorizontalAlign.Start)
-                .height("100%")
-              }
-              .width("100%")
-              .height(400)
+                }.alignItems(HorizontalAlign.Start).height("100%")
+              }.width("100%").height(400)
 
               // SETTINGS I
 
@@ -1353,9 +1267,9 @@ struct Index {
                 Column({ space: 10 }) {
 
                   Text($r("app.string.Card_Progress_Title_Manage"))
-                    .visibility((this.isNotViewingDetail()) ? Visibility.Hidden : Visibility.Visible)
+                    .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
                     .offset({ y: this.STATUS_card_expanding != -1 ? 0 : 50 })
-                    .animation(this.animateParam(600))
+                    .animation(this.DESIGN_animateParam(600))
                     .fontSize(22)
                     .maxLines(1)
                     .fontColor(this.DESIGN_font_color)
@@ -1367,30 +1281,27 @@ struct Index {
                       .fontSize(15)
                       .fontColor(this.DESIGN_block_background_color)
                       .fontWeight(FontWeight.Bolder)
-                      .animation(this.animateParam(0))
+                      .animation(this.DESIGN_animateParam(0))
                   }
                   .clickEffect({ level: ClickEffectLevel.LIGHT })
                   .width("100%")
                   .padding(5)
                   .backgroundColor(this.DESIGN_font_color)
                   .onClick(() => {
-                    this.move_card_to_index(this.STATUS_card_expanding, 0)
-                    // SWITCH CARD POSITIONS
+                    this.VIEW_move_card_to_index(this.STATUS_card_expanding, 0) // SWITCH CARD POSITIONS
                     this.STATUS_card_expanding = 0
                     this.STATUS_card_index_of_last_expanded = 0
                     this.scroller_main.scrollToIndex(2, true)
-                    this.storeCards()
+                    this.CARD_storeCards()
                   })
 
                   // MOVE TO TOP BUTTON
 
                   Button() {
-                    Text(
-                      this.DATA_cards_name[this.STATUS_card_expanding] == this.DATA_work_working_card_name ?
-                      $r('app.string.Card_Progress_Manage_Delete_Cannot_Ongoing') :
-                        this.EDIT_delete_card_confirm == false ? $r("app.string.Card_Progress_Manage_Delete") :
-                        $r('app.string.General_One_More_Confirm')
-                    )
+                    Text(this.DATA_cards_name[this.STATUS_card_expanding] == this.DATA_work_working_card_name ?
+                    $r('app.string.Card_Progress_Manage_Delete_Cannot_Ongoing') :
+                      this.EDIT_delete_card_confirm == false ? $r("app.string.Card_Progress_Manage_Delete") :
+                      $r('app.string.General_One_More_Confirm'))
                       .fontSize(15)
                       .fontColor(this.EDIT_delete_card_confirm == false ? this.DESIGN_block_background_color :
                       this.DESIGN_font_color)
@@ -1400,11 +1311,11 @@ struct Index {
                   .padding(5)
                   .backgroundColor(this.EDIT_delete_card_confirm == false ? this.DESIGN_font_color :
                   this.DESIGN_block_background_color)
-                  .animation(this.animateParam(0))
+                  .animation(this.DESIGN_animateParam(0))
                   .clickEffect({ level: ClickEffectLevel.LIGHT })
                   .onClick(() => {
-                    if (this.DATA_cards_name[this.STATUS_card_expanding] == this.DATA_work_working_card_name) {
-                      // ONGOING NO DELETE
+                    if (this.DATA_cards_name[this.STATUS_card_expanding] ==
+                    this.DATA_work_working_card_name) { // ONGOING NO DELETE
                       return
                     }
 
@@ -1427,19 +1338,14 @@ struct Index {
                       this.STATUS_card_expanding = -1
                       this.STATUS_card_index_of_last_expanded = -1
 
-                      this.storeCards()
+                      this.CARD_storeCards()
                     }
                   })
 
                   // DELETE CARD BUTTON
 
-                }
-                .alignItems(HorizontalAlign.Start)
-                .height("100%")
-                .width("100%")
-              }
-              .width("100%")
-              .height(400)
+                }.alignItems(HorizontalAlign.Start).height("100%").width("100%")
+              }.width("100%").height(400)
 
               // MANAGING
 
@@ -1452,33 +1358,28 @@ struct Index {
               color: this.DESIGN_use_backdrop ? this.DESIGN_color_scheme[4] : this.DESIGN_color_scheme[5]
             })
             .backgroundColor(this.DESIGN_use_backdrop ? "#00000000" : this.DESIGN_color_scheme[5])
-            .padding(this.isWideScreen() ? 32 : 20)
-            .height((this.isWideScreen() ? 2 : 4) * this.ENVIRONMENT_screen_height)
+            .padding(this.DETAILS_is_wide_screen() ? 32 : 20)
+            .height((this.DETAILS_is_wide_screen() ? 2 : 4) * 800)
             .width(Math.min(this.ENVIRONMENT_screen_width - 40, 600))
-            .columnsTemplate(this.isWideScreen() ? "1fr 1fr" : "1fr")
+            .columnsTemplate(this.DETAILS_is_wide_screen() ? "1fr 1fr" : "1fr")
             .border({ width: 1, color: "#4d7a7a7a" })
 
             // INFO BODY
-          }
-          .width("100%")
-          .alignItems(HorizontalAlign.Center)
-          .onTouch((event) => {
+          }.width("100%").alignItems(HorizontalAlign.Center).onTouch((event) => {
             if (event.type == TouchType.Up) {
               if (event.target.area.globalPosition.y != undefined) {
                 if (event.target.area.globalPosition.y > 100) {
-                  this.collapseCardDetail(false,false)
-                  // Auto Collapse Detail Card when Swiping down
+                  this.CARD_collapse_card_detail(false, false) // Auto Collapse Detail Card when Swiping down
                 }
               }
             }
-          })
-          .margin({ bottom: 40 })
+          }).margin({ bottom: 40 })
         }
         .backgroundColor("#70000000")
-        .opacity((this.isNotViewingDetail()) ? 0 : 1)
-        .animation(this.animateParam(0))
-        .visibility((this.isNotViewingDetail()) ? Visibility.None : Visibility.Visible)
-        .animation((this.isNotViewingDetail()) ? this.animateParam(300) : { duration: 0 })
+        .opacity((this.DETAILS_is_not_viewing_detail()) ? 0 : 1)
+        .animation(this.DESIGN_animateParam(0))
+        .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.None : Visibility.Visible)
+        .animation((this.DETAILS_is_not_viewing_detail()) ? this.DESIGN_animateParam(300) : { duration: 0 })
         .alignRules({
           center: { anchor: "__container__", align: VerticalAlign.Center },
           middle: { anchor: "__container__", align: HorizontalAlign.Center }
@@ -1486,21 +1387,18 @@ struct Index {
         .width("100%")
         .height("100%")
         .onClick(() => {
-          this.collapseCardDetail(false,true)
-          // CLICK PANEL => CLOSE
+          this.CARD_collapse_card_detail(false, true) // CLICK PANEL => CLOSE
         })
         .edgeEffect(EdgeEffect.Spring)
 
         // CARD POP UP
 
-      }
-      .onAreaChange((_o, n) => {
-        /* DETERMINE SCREEN SIZE AND LAYOUT */
+      }.onAreaChange((_o, n) => { /* DETERMINE SCREEN SIZE AND LAYOUT */
         this.ENVIRONMENT_screen_width = Number(n.width) + 20
         this.ENVIRONMENT_screen_height = Number(n.height) + 30
 
-        if (this.isNotViewingDetail()) {
-          this.setWaterFlowLayout()
+        if (this.DETAILS_is_not_viewing_detail()) {
+          this.UI_set_waterFlow_layout()
         }
 
         let hour = Number(Date().split(" ")[4].split(":")[0])
@@ -1517,8 +1415,8 @@ struct Index {
         } else {
           this.STATUS_current_time_period = "Sleep"
         }
-        this.UI_top_card_greetings_address = "app.string.Greetings_" + this.STATUS_current_time_period
-        /* Determine current time period for Greetings */
+        this.UI_top_card_greetings_address =
+          "app.string.Greetings_" + this.STATUS_current_time_period /* Determine current time period for Greetings */
       })
 
       // Body
@@ -1540,38 +1438,36 @@ struct Index {
 
       // COVER CONTINUES
 
-    }
-    .backgroundColor($r('app.color.start_window_background'))
+    }.backgroundColor($r('app.color.start_window_background'))
 
   }
 
   onChangeBackground() {
     if (this.UI_backdrop_choose[0] == 0) {
-      this.switch_use_backdrop(false)
+      // If chosen not to use image backdrop
+      this.DESIGN_use_image_backdrop(false)
     } else {
-      this.switch_use_backdrop(true)
+      // If chosen to use image backdrop
+      this.DESIGN_use_image_backdrop(true)
     }
-    this.setSegmentButtonOptions()
+    this.UI_set_SegmentButton_Options()
   }
 
-  onColorModeChange() {
-    // Load Colors
-    this.readDesign()
+  onColorModeChange() { // Load Colors
+    this.DESIGN_read_design()
   }
 
   onDirectionChange() {
   }
 
   onCardExpand() {
-    if (this.isNotViewingDetail()) {
-      this.setWaterFlowLayout()
-      // if collapsed
-    } else {
-      // if is going to expand
+    if (this.DETAILS_is_not_viewing_detail()) {
+      this.UI_set_waterFlow_layout() // if collapsed
+    } else { // if is going to expand
     }
   }
 
-  readDesign() {
+  DESIGN_read_design() {
     KVManagerTools.getValueOfKey("use_backdrop").then((result) => {
       if (result as string == "true") {
         this.DESIGN_use_backdrop = true
@@ -1580,19 +1476,18 @@ struct Index {
       } else {
         this.DESIGN_use_backdrop = false
         this.UI_backdrop_choose = [0]
-      }
-      // this.readColors()
+      } // this.readColors()
     })
     KVManagerTools.getValueOfKey("color_scheme_light").then((result) => {
       this.DESIGN_color_scheme_light = (result as string).split(",")
       KVManagerTools.getValueOfKey("color_scheme_dark").then((result) => {
         this.DESIGN_color_scheme_dark = (result as string).split(",")
-        this.updateKeyColors()
+        this.DESIGN_update_key_colors()
       })
     })
     KVManagerTools.getValueOfKey("Min_block_size").then((result) => {
       this.DESIGN_min_card_size = Number(result as string)
-      this.setWaterFlowLayout()
+      this.UI_set_waterFlow_layout()
     })
     KVManagerTools.getValueOfKey("blur_radius").then((result) => {
       this.DESIGN_cards_blur_radius = Number(result as string)
@@ -1602,20 +1497,19 @@ struct Index {
     })
   }
 
-  updateKeyColors() {
+  DESIGN_update_key_colors() {
     if (this.ENVIRONMENT_current_color_mode == ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) {
       this.DESIGN_color_scheme = this.DESIGN_color_scheme_light
     } else {
       this.DESIGN_color_scheme = this.DESIGN_color_scheme_dark
     }
-    this.DESIGN_font_color =
-      this.DESIGN_use_backdrop ? this.DESIGN_color_scheme[2] : this.DESIGN_color_scheme[3]
+    this.DESIGN_font_color = this.DESIGN_use_backdrop ? this.DESIGN_color_scheme[2] : this.DESIGN_color_scheme[3]
     this.DESIGN_block_background_color =
       this.DESIGN_use_backdrop ? this.DESIGN_color_scheme[4] : this.DESIGN_color_scheme[5]
-    this.setSegmentButtonOptions()
+    this.UI_set_SegmentButton_Options()
   }
 
-  switch_use_backdrop(use_or_not: boolean) {
+  DESIGN_use_image_backdrop(use_or_not: boolean) {
     this.DESIGN_use_backdrop = use_or_not
     this.DESIGN_font_color = this.DESIGN_use_backdrop ? this.DESIGN_color_scheme[2] : this.DESIGN_color_scheme[3]
     this.DESIGN_block_background_color =
@@ -1623,7 +1517,88 @@ struct Index {
     KVManagerTools.putValueOfKey("use_backdrop", String(this.DESIGN_use_backdrop))
   }
 
-  switch_card_position(first: number, second: number) {
+  DESIGN_store_current_design() {
+    console.log(this.DESIGN_color_scheme_light.toString() + ' light_qwq')
+    console.log(this.DESIGN_color_scheme_dark.toString() + ' dark_qwq')
+    KVManagerTools.putValueOfKey("color_scheme_light", this.DESIGN_color_scheme_light.toString())
+    KVManagerTools.putValueOfKey("color_scheme_dark", this.DESIGN_color_scheme_dark.toString())
+    KVManagerTools.putValueOfKey("blur_radius", this.DESIGN_cards_blur_radius.toString())
+    KVManagerTools.putValueOfKey("Min_block_size", this.DESIGN_min_card_size.toString())
+  }
+
+  DESIGN_animateParam(delay: number) {
+    let ap: AnimateParam = { delay: delay, duration: 300, curve: Curve.ExtremeDeceleration }
+    return ap
+  }
+
+  DETAILS_is_wide_screen() {
+    return this.ENVIRONMENT_screen_width - 40 > 600
+  }
+
+  DETAILS_is_not_viewing_detail() {
+    return (this.STATUS_card_expanding == -1)
+  }
+
+  UI_set_SegmentButton_Options() {
+    this.UI_backdrop_segment_button_options = SegmentButtonOptions.tab({
+      buttons: [{ text: $r("app.string.Settings_Content_Background_Color") },
+        { text: $r("app.string.Settings_Content_Background_Image") }],
+      fontColor: this.DESIGN_font_color,
+      selectedFontColor: this.DESIGN_block_background_color,
+      fontWeight: FontWeight.Medium,
+      selectedFontWeight: FontWeight.Bolder,
+      selectedBackgroundColor: this.DESIGN_font_color
+    })
+  }
+
+  UI_set_waterFlow_layout() {
+    this.UI_waterFlow_Columns = 0
+    this.UI_waterFlow_Layout = ""
+    for (let i = this.ENVIRONMENT_screen_width; i > 0; i = i - this.DESIGN_min_card_size) {
+      this.UI_waterFlow_Layout = this.UI_waterFlow_Layout + "1fr "
+      this.UI_waterFlow_Columns += 1
+    }
+
+    if (this.UI_waterFlow_Columns == 0) {
+      this.UI_waterFlow_Columns = 1 // Total length of head and first head block
+    } /* Initialize WaterFlow layout according to screen width
+         * */
+  }
+
+  CARD_add_card() {
+    if (this.ADD_name == "") { // Save Card and Add
+      // Empty Name Cannot Add
+      return false
+    }
+
+    if (this.DATA_cards_name.includes(this.ADD_name)) {
+      // Name crash
+      return false
+    }
+
+    this.DATA_cards_name.push(this.ADD_name)
+    if (this.ADD_description == "") {
+      console.log("empty desc")
+      this.DATA_cards_desc.push("喵 meow")
+    } else {
+      this.DATA_cards_desc.push(this.ADD_description)
+    }
+    this.DATA_cards_length.push(this.ADD_length)
+    this.DATA_cards_time_limit.push(this.ADD_time_limit)
+    this.DATA_cards_target.push(this.ADD_value_target)
+    this.DATA_cards_done.push(0)
+    this.DATA_cards_start.push(systemDateTime.getTime())
+    this.DATA_cards_end.push(systemDateTime.getTime() + 86400000 * this.ADD_time_limit)
+    this.CARD_storeCards()
+
+    this.ADD_name = ""
+    this.ADD_description = ""
+
+    return true
+
+  }
+
+  VIEW_switch_card_position(first: number, second: number) {
     let temp: string | number = ""
     temp = this.DATA_cards_name[first]
     this.DATA_cards_name[first] = this.DATA_cards_name[second]
@@ -1651,7 +1626,7 @@ struct Index {
     this.DATA_cards_done[second] = temp
   }
 
-  move_card_to_index(from: number, to: number) {
+  VIEW_move_card_to_index(from: number, to: number) {
     let temp: string | number = ""
     temp = this.DATA_cards_name.splice(from, 1)[0]
     this.DATA_cards_name.splice(to, 0, temp)
@@ -1671,34 +1646,7 @@ struct Index {
     this.DATA_cards_done.splice(to, 0, temp)
   }
 
-  startCard(name: string) {
-    if (this.isWorkOnIdle()) {
-      this.DATA_work_working_card_name = name
-      this.DATA_work_start = systemDateTime.getTime()
-      this.storeWorkingState()
-      this.move_card_to_index(this.STATUS_card_expanding, 0)
-    } else {
-      console.log("Cannot Start Card Since There Already Exists an Ongoing Card")
-    }
-  }
-
-  endCard() {
-    if (this.isWorkOnIdle()) {
-      console.log("Cannot End Card Since NO Card is Ongoing")
-      // Is currently not working
-    } else {
-      let time_length = (systemDateTime.getTime() - this.DATA_work_start) / 1000 / 3600
-      this.DATA_cards_done[this.DATA_cards_name.indexOf(this.DATA_work_working_card_name)] += time_length
-      this.DATA_work_working_card_name = ""
-      this.DATA_work_start = 0
-      this.DATA_work_last_end = systemDateTime.getTime()
-      this.storeWorkingState()
-      this.storeCards()
-      // End Card Work
-    }
-  }
-
-  collapseCardDetail(scroll_main: boolean, scroll_detail: boolean) {
+  CARD_collapse_card_detail(scroll_main: boolean, scroll_detail: boolean) {
     this.STATUS_card_expanding = -1
     if (scroll_detail) {
       this.scroller_card_expand.scrollTo({ xOffset: 0, yOffset: 0 })
@@ -1708,7 +1656,20 @@ struct Index {
     }
   }
 
-  getDonePercentage() {
+  CARD_get_done_value() {
+    let target = this.DATA_cards_target[this.STATUS_card_index_of_last_expanded]
+    let done = this.DATA_cards_done[this.STATUS_card_index_of_last_expanded]
+    if (target == 1001) {
+      return 500
+    }
+    if (done > target) { // if over kill
+      return target
+    } else { // if not done
+      return done
+    }
+  }
+
+  CARD_get_done_percentage() {
     let target = this.DATA_cards_target[this.STATUS_card_index_of_last_expanded]
     let done = this.DATA_cards_done[this.STATUS_card_index_of_last_expanded]
     if (target == 1001) {
@@ -1718,7 +1679,7 @@ struct Index {
     }
   }
 
-  getTimeLeftPercentage() {
+  CARD_get_time_left_percentage() {
     let limit = this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded]
     let end = this.DATA_cards_end[this.STATUS_card_index_of_last_expanded]
     if (limit == 367) {
@@ -1728,100 +1689,24 @@ struct Index {
     }
   }
 
-  getNextEveryDay() {
+  CARD_get_next_every_day_work() {
     let target = this.DATA_cards_target[this.STATUS_card_index_of_last_expanded]
     let done = this.DATA_cards_done[this.STATUS_card_index_of_last_expanded]
     let limit = this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded]
 
-    if (done > target) {
-      // Already finished
+    if (done > target) { // Already finished
       return "( •̀ ω •́ )✧"
     }
-    if (this.UI_card_expanded_remaining_days == 0) {
-      // Already over due
+    if (this.UI_card_expanded_remaining_days == 0) { // Already over due
       return "1"
     }
-    if (limit == 367 || target == 1001) {
-      // Infinite goal
+    if (limit == 367 || target == 1001) { // Infinite goal
       return " ∞ "
-    }
-    // Regular situations
+    } // Regular situations
     return ((target - done) / this.UI_card_expanded_remaining_days).toFixed(4)
   }
 
-  getDoneGaugeValue() {
-    let target = this.DATA_cards_target[this.STATUS_card_index_of_last_expanded]
-    let done = this.DATA_cards_done[this.STATUS_card_index_of_last_expanded]
-    if (target == 1001) {
-      return 500
-    }
-    if (done > target) {
-      // if over kill
-      return target
-    } else {
-      // if not done
-      return done
-    }
-  }
-
-  isWideScreen() {
-    return this.ENVIRONMENT_screen_width - 40 > 600
-  }
-
-  isNotViewingDetail() {
-    return (this.STATUS_card_expanding == -1)
-  }
-
-  isWorkOnIdle() {
-    return this.DATA_work_working_card_name == ""
-  }
-
-  animateParam(delay: number) {
-    let ap: AnimateParam = { delay: delay, duration: 300, curve: Curve.ExtremeDeceleration }
-    return ap
-  }
-
-  setSegmentButtonOptions() {
-    this.UI_backdrop_segment_button_options = SegmentButtonOptions.tab({
-      buttons: [
-        { text: $r("app.string.Settings_Content_Background_Color") },
-        { text: $r("app.string.Settings_Content_Background_Image") }],
-      fontColor: this.DESIGN_font_color,
-      selectedFontColor: this.DESIGN_block_background_color,
-      fontWeight: FontWeight.Medium,
-      selectedFontWeight: FontWeight.Bolder,
-      selectedBackgroundColor: this.DESIGN_font_color
-    })
-  }
-
-  setWaterFlowLayout() {
-    this.UI_waterFlow_Columns = 0
-    this.UI_waterFlow_Layout = ""
-    for (let i = this.ENVIRONMENT_screen_width; i > 0; i = i - this.DESIGN_min_card_size) {
-      this.UI_waterFlow_Layout = this.UI_waterFlow_Layout + "1fr "
-      this.UI_waterFlow_Columns += 1
-    }
-
-    if (this.UI_waterFlow_Columns == 0) {
-      this.UI_waterFlow_Columns = 1
-      // Total length of head and first head block
-    }
-    /* Initialize WaterFlow layout according to screen width
-         * */
-  }
-
-  storeCurrentDesign() {
-    console.log(this.DESIGN_color_scheme_light.toString() + ' light_qwq')
-    console.log(this.DESIGN_color_scheme_dark.toString() + ' dark_qwq')
-    KVManagerTools.putValueOfKey("color_scheme_light",
-      this.DESIGN_color_scheme_light.toString())
-    KVManagerTools.putValueOfKey("color_scheme_dark",
-      this.DESIGN_color_scheme_dark.toString())
-    KVManagerTools.putValueOfKey("blur_radius", this.DESIGN_cards_blur_radius.toString())
-    KVManagerTools.putValueOfKey("Min_block_size", this.DESIGN_min_card_size.toString())
-  }
-
-  storeCards() {
+  CARD_storeCards() {
     KVManagerTools.putValueOfKey("cards_name", this.DATA_cards_name.toString())
     KVManagerTools.putValueOfKey("cards_desc", this.DATA_cards_desc.toString())
     KVManagerTools.putValueOfKey("cards_length", this.DATA_cards_length.toString())
@@ -1832,7 +1717,36 @@ struct Index {
     KVManagerTools.putValueOfKey("cards_end", this.DATA_cards_end.toString())
   }
 
-  storeWorkingState() {
+  WORK_start_card(name: string) {
+    if (this.WORK_is_work_on_idle()) {
+      this.DATA_work_working_card_name = name
+      this.DATA_work_start = systemDateTime.getTime()
+      this.WORK_storeWorkingState()
+      this.VIEW_move_card_to_index(this.STATUS_card_expanding, 0)
+    } else {
+      console.log("Cannot Start Card Since There Already Exists an Ongoing Card")
+    }
+  }
+
+  WORK_end_card() {
+    if (this.WORK_is_work_on_idle()) {
+      console.log("Cannot End Card Since NO Card is Ongoing") // Is currently not working
+    } else {
+      let time_length = (systemDateTime.getTime() - this.DATA_work_start) / 1000 / 3600
+      this.DATA_cards_done[this.DATA_cards_name.indexOf(this.DATA_work_working_card_name)] += time_length
+      this.DATA_work_working_card_name = ""
+      this.DATA_work_start = 0
+      this.DATA_work_last_end = systemDateTime.getTime()
+      this.WORK_storeWorkingState()
+      this.CARD_storeCards() // End Card Work
+    }
+  }
+
+  WORK_is_work_on_idle() {
+    return this.DATA_work_working_card_name == ""
+  }
+
+  WORK_storeWorkingState() {
     KVManagerTools.putValueOfKey("DATA_work_working_card_name", this.DATA_work_working_card_name)
     KVManagerTools.putValueOfKey("DATA_work_start", this.DATA_work_start.toString())
     KVManagerTools.putValueOfKey("DATA_work_last_end", this.DATA_work_last_end.toString())
@@ -1882,8 +1796,7 @@ struct LinysBlock {
             .fontWeight(FontWeight.Bold)
             .margin({ bottom: 6 })
             .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-          // BIG TITLE
+            .textOverflow({ overflow: TextOverflow.Ellipsis }) // BIG TITLE
 
           Row() {
             Text(this.done == undefined ? "" : this.done.toFixed(2))
@@ -1893,47 +1806,30 @@ struct LinysBlock {
             Text("／" + (this.target == 1001 ? " ∞ " : String(this.target)))
               .fontSize(16)
               .fontColor(this.DESIGN_font_color)
-            Text($r('app.string.Add_Value_Unit_Hour'))
-              .fontSize(16)
-              .fontColor(this.DESIGN_font_color)
-          }
-          .alignItems(VerticalAlign.Bottom)
-          .margin({ bottom: 14 })
-          .width("100%")
+            Text($r('app.string.Add_Value_Unit_Hour')).fontSize(16).fontColor(this.DESIGN_font_color)
+          }.alignItems(VerticalAlign.Bottom).margin({ bottom: 14 }).width("100%")
 
           // BIG DIGITS
 
           Row() {
-            Text($r('app.string.Card_Days_Total'))
-              .fontSize(14)
-              .fontColor(this.DESIGN_font_color)
+            Text($r('app.string.Card_Days_Total')).fontSize(14).fontColor(this.DESIGN_font_color)
             Text((this.time_limit == 367 ? " ∞ " : String(this.time_limit)))
               .fontSize(14)
               .fontColor(this.DESIGN_font_color)
               .fontWeight(FontWeight.Bold)
-            Text($r('app.string.Card_Days_Unit_Day'))
-              .fontSize(14)
-              .fontColor(this.DESIGN_font_color)
-          }
-          .width("100%")
+            Text($r('app.string.Card_Days_Unit_Day')).fontSize(14).fontColor(this.DESIGN_font_color)
+          }.width("100%")
 
           // TOTAL DAYS
 
           Row() {
-            Text($r("app.string.Card_Days_Remaining"))
-              .fontSize(14)
-              .fontColor(this.DESIGN_font_color)
-            Text(
-              this.time_limit == 367 ? " ∞ " : this.getRemainingDays().toFixed(1)
-            )
+            Text($r("app.string.Card_Days_Remaining")).fontSize(14).fontColor(this.DESIGN_font_color)
+            Text(this.time_limit == 367 ? " ∞ " : this.getRemainingDays().toFixed(1))
               .fontSize(14)
               .fontColor(this.DESIGN_font_color)
               .fontWeight(FontWeight.Bold)
-            Text($r('app.string.Card_Days_Unit_Day'))
-              .fontSize(14)
-              .fontColor(this.DESIGN_font_color)
-          }
-          .width("100%")
+            Text($r('app.string.Card_Days_Unit_Day')).fontSize(14).fontColor(this.DESIGN_font_color)
+          }.width("100%")
 
           // REMAINING DAYS
 
@@ -1987,8 +1883,7 @@ struct LinysBlock {
         this.UI_card_pressed = false
       }
     })
-    .onClick((_event) => {
-      // Expand and Check details
+    .onClick((_event) => { // Expand and Check details
       this.STATUS_card_expanding = this.index
       this.STATUS_last_expanded = this.index
       this.setDetailsInfo()
@@ -2002,25 +1897,18 @@ struct LinysBlock {
 
   setDetailsInfo() {
     this.DETAILS_remaining_days = this.getRemainingDays()
-    if (this.done > this.target) {
-      // Already finished
+    if (this.done > this.target) { // Already finished
       this.DETAILS_card_slogan = "app.string.Card_Progress_Desc_Already_Done"
-    } else {
-      // Not finished
+    } else { // Not finished
       if (this.time_limit == 367) {
-        this.DETAILS_card_slogan = "app.string.Card_Progress_Desc_Time_Ad_Astra_Abyssosque"
-        // No time limit
+        this.DETAILS_card_slogan = "app.string.Card_Progress_Desc_Time_Ad_Astra_Abyssosque" // No time limit
       } else if (this.DETAILS_remaining_days / this.time_limit > 0.6) {
-        this.DETAILS_card_slogan = "app.string.Card_Progress_Desc_Time_Sufficient"
-        // Sufficient (>60%)
+        this.DETAILS_card_slogan = "app.string.Card_Progress_Desc_Time_Sufficient" // Sufficient (>60%)
       } else if (this.DETAILS_remaining_days / this.time_limit > 0.4) {
-        this.DETAILS_card_slogan = "app.string.Card_Progress_Desc_Time_OK"
-        // OK (>40%)
+        this.DETAILS_card_slogan = "app.string.Card_Progress_Desc_Time_OK" // OK (>40%)
       } else if (this.DETAILS_remaining_days > 0) {
-        this.DETAILS_card_slogan = "app.string.Card_Progress_Desc_Time_Quick"
-        // QUICK (>0%)
-      } else {
-        // Over due
+        this.DETAILS_card_slogan = "app.string.Card_Progress_Desc_Time_Quick" // QUICK (>0%)
+      } else { // Over due
         this.DETAILS_card_slogan = "app.string.Card_Progress_Desc_Over_Due"
       }
     }
@@ -2030,14 +1918,11 @@ struct LinysBlock {
     this.DETAILS_Edit_Length = this.card_length
 
     if (this.card_length < 270) {
-      this.DETAILS_Edit_Length_Description = "app.string.Add_Length_Notice_Short"
-      // Card length Short (l<270)
+      this.DETAILS_Edit_Length_Description = "app.string.Add_Length_Notice_Short" // Card length Short (l<270)
     } else if (this.card_length < 330) {
-      this.DETAILS_Edit_Length_Description = "app.string.Add_Length_Notice_Medium"
-      // Card length Medium (l<330)
+      this.DETAILS_Edit_Length_Description = "app.string.Add_Length_Notice_Medium" // Card length Medium (l<330)
     } else {
-      this.DETAILS_Edit_Length_Description = "app.string.Add_Length_Notice_Long"
-      // Card length Long
+      this.DETAILS_Edit_Length_Description = "app.string.Add_Length_Notice_Long" // Card length Long
     }
   }
 }
@@ -2055,20 +1940,12 @@ struct LinysSymbolButton {
     Column() {
       SymbolGlyph(this.STATUS_switch_to_arrow ? $r("sys.symbol.chevron_down") : this.UI_image)
         .fontSize(this.UI_image_size)
-        .fontColor([
-          this.DESIGN_font_color as ResourceColor,
-          this.DESIGN_font_color as ResourceColor,
-          this.DESIGN_font_color as ResourceColor
-        ])// .effectStrategy(1)
+        .fontColor([this.DESIGN_font_color as ResourceColor, this.DESIGN_font_color as ResourceColor,
+          this.DESIGN_font_color as ResourceColor])// .effectStrategy(1)
         .symbolEffect(new ReplaceSymbolEffect(EffectScope.WHOLE), Number(this.STATUS_trigger))
 
-      Text(this.UI_text)
-        .margin({ top: 10 })
-        .fontColor(this.DESIGN_font_color)
-    }
-    .padding(15)
-    .backgroundColor(Color.Transparent)
-    .borderRadius(8)
+      Text(this.UI_text).margin({ top: 10 }).fontColor(this.DESIGN_font_color)
+    }.padding(15).backgroundColor(Color.Transparent).borderRadius(8)
   }
 }
 
