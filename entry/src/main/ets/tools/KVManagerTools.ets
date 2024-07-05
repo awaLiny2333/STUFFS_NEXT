@@ -73,10 +73,10 @@ export class KVManagerTools {
     if (kvStore !== undefined) {
       kvStore.put(keyName, putContent, (err) => {
         if (err !== undefined) {
-          console.error(`Failed to put data. Code:${err.code},message:${err.message}`);
+          console.error(`Failed to put data. Code: ${err.code},message:${err.message}`);
           return;
         } else {
-          console.info('Succeeded in putting data. Data:' + putContent + " qwq");
+          console.info('Succeeded in putting data. Data: ' + putContent + " qwq");
         }
       });
     } else {
