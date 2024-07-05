@@ -83,6 +83,7 @@ struct Index {
   @State DATA_cards_done: number[] = []
   @State DATA_cards_start: number[] = []
   @State DATA_cards_end: number[] = []
+  @State DATA_cards_punch_card: number[][] = []
   @State DATA_work_working_card_name: string = ""
   @State DATA_work_start: number = 0
   @State DATA_work_last_end: number = systemDateTime.getTime()
@@ -113,7 +114,7 @@ struct Index {
           if (this.DATA_cards_name[0] == "") {
             this.DATA_cards_name = []
           }
-          console.log(this.DATA_cards_name.toString() + "cat")
+          console.log("Card_name: " + this.DATA_cards_name.toString())
         })
         KVManagerTools.getValueOfKey("cards_desc").then((result) => {
           this.DATA_cards_desc = (result as string).split(",")
@@ -123,14 +124,14 @@ struct Index {
         })
         KVManagerTools.getValueOfKey("cards_length").then((result) => {
           temp = (result as string).split(",")
+          console.log("Cards_length_raw: " + result)
           for (let index = 0; index < temp.length; index++) {
             this.DATA_cards_length.push(Number(temp[index]))
           }
           if (temp[0] == "") {
             this.DATA_cards_length = []
           }
-
-          console.log(this.DATA_cards_length.toString())
+          console.log("Cards_length: " + this.DATA_cards_length.toString())
         })
         KVManagerTools.getValueOfKey("cards_time_limit").then((result) => {
           temp = (result as string).split(",")
@@ -143,6 +144,7 @@ struct Index {
         })
         KVManagerTools.getValueOfKey("cards_target").then((result) => {
           temp = (result as string).split(",")
+          console.log("Cards_target: " + temp.toString())
           for (let index = 0; index < temp.length; index++) {
             this.DATA_cards_target.push(Number(temp[index]))
           }
@@ -176,6 +178,10 @@ struct Index {
           if (temp[0] == "") {
             this.DATA_cards_end = []
           }
+        })
+        KVManagerTools.getValueOfKey("cards_punch_card").then((result) => {
+          console.log("Cards_punch_card: " + result as string)
+          this.DATA_cards_punch_card = this.UTIL_string_to_number_mat(result as string)
         })
         KVManagerTools.getValueOfKey("DATA_work_working_card_name").then((result) => {
           this.DATA_work_working_card_name = result as string
@@ -1589,6 +1595,7 @@ struct Index {
     this.DATA_cards_done.push(0)
     this.DATA_cards_start.push(systemDateTime.getTime())
     this.DATA_cards_end.push(systemDateTime.getTime() + 86400000 * this.ADD_time_limit)
+    this.DATA_cards_punch_card.push(this.WORK_create_punch_card(this.ADD_time_limit))
     this.CARD_storeCards()
 
     this.ADD_name = ""
@@ -1599,7 +1606,7 @@ struct Index {
   }
 
   VIEW_switch_card_position(first: number, second: number) {
-    let temp: string | number = ""
+    let temp: string | number | number[] | string[] = ""
     temp = this.DATA_cards_name[first]
     this.DATA_cards_name[first] = this.DATA_cards_name[second]
     this.DATA_cards_name[second] = temp
@@ -1624,10 +1631,13 @@ struct Index {
     temp = this.DATA_cards_done[first]
     this.DATA_cards_done[first] = this.DATA_cards_done[second]
     this.DATA_cards_done[second] = temp
+    temp = this.DATA_cards_punch_card[first]
+    this.DATA_cards_punch_card[first] = this.DATA_cards_punch_card[second]
+    this.DATA_cards_punch_card[second] = temp
   }
 
   VIEW_move_card_to_index(from: number, to: number) {
-    let temp: string | number = ""
+    let temp: string | number | number[] | string[] = ""
     temp = this.DATA_cards_name.splice(from, 1)[0]
     this.DATA_cards_name.splice(to, 0, temp)
     temp = this.DATA_cards_desc.splice(from, 1)[0]
@@ -1644,6 +1654,8 @@ struct Index {
     this.DATA_cards_end.splice(to, 0, temp)
     temp = this.DATA_cards_done.splice(from, 1)[0]
     this.DATA_cards_done.splice(to, 0, temp)
+    temp = this.DATA_cards_punch_card.splice(from, 1)[0]
+    this.DATA_cards_punch_card.splice(to, 0, temp)
   }
 
   CARD_collapse_card_detail(scroll_main: boolean, scroll_detail: boolean) {
@@ -1715,6 +1727,7 @@ struct Index {
     KVManagerTools.putValueOfKey("cards_done", this.DATA_cards_done.toString())
     KVManagerTools.putValueOfKey("cards_start", this.DATA_cards_start.toString())
     KVManagerTools.putValueOfKey("cards_end", this.DATA_cards_end.toString())
+    KVManagerTools.putValueOfKey("cards_punch_card", this.UTIL_mat_to_string(this.DATA_cards_punch_card))
   }
 
   WORK_start_card(name: string) {
@@ -1723,6 +1736,7 @@ struct Index {
       this.DATA_work_start = systemDateTime.getTime()
       this.WORK_storeWorkingState()
       this.VIEW_move_card_to_index(this.STATUS_card_expanding, 0)
+      this.CARD_storeCards()
     } else {
       console.log("Cannot Start Card Since There Already Exists an Ongoing Card")
     }
@@ -1734,6 +1748,7 @@ struct Index {
     } else {
       let time_length = (systemDateTime.getTime() - this.DATA_work_start) / 1000 / 3600
       this.DATA_cards_done[this.DATA_cards_name.indexOf(this.DATA_work_working_card_name)] += time_length
+      this.WORK_punch_card_add(this.DATA_work_working_card_name, time_length)
       this.DATA_work_working_card_name = ""
       this.DATA_work_start = 0
       this.DATA_work_last_end = systemDateTime.getTime()
@@ -1750,6 +1765,83 @@ struct Index {
     KVManagerTools.putValueOfKey("DATA_work_working_card_name", this.DATA_work_working_card_name)
     KVManagerTools.putValueOfKey("DATA_work_start", this.DATA_work_start.toString())
     KVManagerTools.putValueOfKey("DATA_work_last_end", this.DATA_work_last_end.toString())
+  }
+
+  WORK_create_punch_card(length: number) {
+    let punch_card: number[] = []
+    for (let index = 0; index <= length; index++) {
+      punch_card.push(0)
+    }
+    return punch_card
+  }
+
+  WORK_punch_card_add(name: string, record: number) {
+    let index = this.DATA_cards_name.indexOf(name)
+    let time_start = this.DATA_cards_start[index]
+    let today_index = this.UTIL_get_relative_time_passed(time_start, systemDateTime.getTime())
+
+    if (index == -1) {
+      // Error of an nonexistent work
+      console.log("Punch: failed due to an nonexistent work")
+      return false
+    }
+
+    if (today_index >= this.DATA_cards_time_limit[index]) {
+      // Overdue Punch
+      console.log("Punch: overdue, added to last position")
+      this.DATA_cards_punch_card[index][this.DATA_cards_punch_card[index].length-1] =
+        this.DATA_cards_punch_card[index][this.DATA_cards_punch_card[index].length-1] + record
+
+      return false
+    }
+
+    this.DATA_cards_punch_card[index][today_index] = this.DATA_cards_punch_card[index][today_index] + record
+
+    console.log("Punch: success")
+    return true
+  }
+
+  UTIL_get_relative_time_passed(from: number, to: number) {
+    let days = Math.floor((to - from) / 1000 / 3600 / 24)
+    return days
+  }
+
+  UTIL_mat_to_string(input: number[][] | string[][]) {
+    let output = ""
+    for (let index = 0; index < input.length; index++) {
+      output += input[index].toString()
+      if (index != input.length - 1) {
+        output += ";"
+        // If not the last row, then add ";"
+      }
+    }
+    return output
+  }
+
+  UTIL_string_to_string_mat(input: string) {
+    let rows = input.split(";")
+    let output: string[][] = []
+    for (let index = 0; index < rows.length; index++) {
+      output.push(rows[index].split(","))
+    }
+    return output
+  }
+
+  UTIL_string_to_number_mat(input: string) {
+    let rows = input.split(";")
+    let output: number[][] = []
+    let line: string[] = []
+    let line_of_number: number[] = []
+    for (let index = 0; index < rows.length; index++) {
+      line = rows[index].split(",")
+      line_of_number = []
+      for (let k = 0; k < line.length; k++) {
+        line_of_number.push(Number(line[k]))
+        // convert the line into number line
+      }
+      output.push(line_of_number)
+    }
+    return output
   }
 }
 
