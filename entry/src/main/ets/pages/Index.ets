@@ -57,6 +57,7 @@ struct Index {
   })
   @State UI_card_expanded_remaining_days: number = 0
   @State UI_card_expanded_slogan_of_time: string = "Card_Progress_Desc_Time_"
+  @State UI_card_expanded_viewing_detail_of_block_index: number = 0
   @State UI_start_up_cover_continue_opacity: number = 1
   @State SETTINGS_color_scheme_edit_light: string = this.DESIGN_color_scheme_light.toString()
   @State SETTINGS_color_scheme_edit_dark: string = this.DESIGN_color_scheme_dark.toString()
@@ -950,6 +951,8 @@ struct Index {
             .animation({ delay: 50, duration: 350, curve: Curve.ExtremeDeceleration })
             .onAreaChange(() => {
               this.EDIT_delete_card_confirm = false
+              this.UI_card_expanded_viewing_detail_of_block_index = this.CARD_get_today_block_index()
+
 
               // RESET STUFFS WHEN EXPANDING
 
@@ -1053,7 +1056,7 @@ struct Index {
                 .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 350))
                 .width("100%")
                 .height("100%")
-              }.width("100%").height(190)
+              }.width("100%").height(this.DETAILS_is_wide_screen() ? 190 : 200)
 
               // DONE GRAPH
 
@@ -1105,7 +1108,7 @@ struct Index {
                   .trackShadow({ radius: 7, offsetX: -7, offsetY: 7 })
                   .height(180)
                 }.alignItems(HorizontalAlign.Center).width("100%")
-              }.width("100%").height(this.DETAILS_is_wide_screen() ? 270 : 200)
+              }.width("100%").height(this.DETAILS_is_wide_screen() ? 250 : 200)
 
               // TIME LEFT GRAPH
 
@@ -1114,7 +1117,7 @@ struct Index {
                   Text($r("app.string.Card_Progress_Desc_Estimating")).fontSize(16).fontColor(this.DESIGN_font_color)
 
                   Row() {
-                    Text(this.CARD_get_average_daily_work_left_processed())
+                    Text(this.CARD_get_average_daily_work_left_processed_for_display())
                       .fontSize(40)
                       .fontColor(this.DESIGN_font_color)
                       .fontWeight(FontWeight.Bold)
@@ -1161,35 +1164,63 @@ struct Index {
                 .width("100%")
 
                 // PLAN ESTIMATED
-              }.width("100%").height(this.DETAILS_is_wide_screen() ? 270 : 240)
+              }.width("100%").height(this.DETAILS_is_wide_screen() ? 250 : 240)
 
               // EXPLANATION
 
               FlowItem() {
-                LinysDataBlocks({
+                LinysDataBoard({
                   DATA_list_of_data: this.DATA_cards_punch_card[this.STATUS_card_index_of_last_expanded],
-                  DESIGN_block_color: this.DESIGN_font_color,
-                  DATA_Reference_value: this.CARD_get_average_daily_work(),
-                  ENVIRONMENT_screen_width: this.ENVIRONMENT_screen_width,
+                  DATA_reference_value: this.CARD_get_average_daily_work(),
                   DATA_first_day_stamp: this.DATA_cards_start[this.STATUS_card_index_of_last_expanded],
-                  STATUS_current_expand: this.STATUS_card_expanding
+                  DATA_today_index:
+                  this.UTIL_get_relative_time_passed(
+                    this.DATA_cards_start[this.STATUS_card_index_of_last_expanded], systemDateTime.getTime()
+                  ),
+                  STATUS_current_expand: this.STATUS_card_expanding,
+                  ENVIRONMENT_screen_width: this.ENVIRONMENT_screen_width,
+                  DESIGN_block_color: this.DESIGN_font_color,
+                  DESIGN_button_text_color: this.DESIGN_block_background_color,
+                  UI_chosen_block_index: this.UI_card_expanded_viewing_detail_of_block_index
                 })
                   .offset({ y: (this.DETAILS_is_not_viewing_detail()) ? 100 : 0 })
                   .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
                   .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 550))
-              }.width("100%").height(220)
+              }.width("100%").height(270)
 
               FlowItem() {
-              }.width("1005").height(this.DETAILS_is_wide_screen() ? 220 : 0)
+                Column({ space: 5 }) {
+                  Text($r("app.string.Data_Board_Submitted"))
+                    .fontSize(16)
+                    .fontColor(this.DESIGN_font_color)
+                  Text(this.STATUS_card_index_of_last_expanded == -1 ? "0" :
+                  this.DATA_cards_punch_card[this.STATUS_card_index_of_last_expanded][this.UI_card_expanded_viewing_detail_of_block_index].toFixed(4))
+                    .fontSize(40)
+                    .fontColor(this.DESIGN_font_color)
+                    .fontWeight(FontWeight.Bold)
+                  Text($r("app.string.Data_Board_Submitted_Hours_Of_Work"))
+                    .fontSize(16)
+                    .fontColor(this.DESIGN_font_color)
+                  Text(this.CARD_get_date_of_chosen()[0])
+                    .fontSize(24)
+                    .fontColor(this.DESIGN_font_color)
+                    .fontWeight(FontWeight.Bold)
+                    .opacity(0.5)
+                    .margin({ top: 20 })
+                }
+
+              }
+              .offset({ y: (this.DETAILS_is_not_viewing_detail()) ? 100 : 0 })
+              .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
+              .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 600))
+              .width("100%")
+              .height(this.DETAILS_is_wide_screen() ? 270 : 200)
 
               // DATA BOARD
 
               FlowItem() {
                 Column({ space: 10 }) {
                   Text($r("app.string.Settings_block_Settings"))
-                    .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
-                    .offset({ y: this.STATUS_card_expanding != -1 ? 0 : 50 })
-                    .animation(this.DESIGN_animateParam(550))
                     .fontSize(22)
                     .maxLines(1)
                     .fontColor(this.DESIGN_font_color)
@@ -1290,6 +1321,9 @@ struct Index {
                   // CONFIRM BUTTON
                 }.alignItems(HorizontalAlign.Start).height("100%")
               }.width("100%").height(400)
+              .offset({ y: (this.DETAILS_is_not_viewing_detail()) ? 100 : 0 })
+              .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
+              .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 650))
 
               // SETTINGS I
 
@@ -1297,9 +1331,6 @@ struct Index {
                 Column({ space: 10 }) {
 
                   Text($r("app.string.Card_Progress_Title_Manage"))
-                    .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
-                    .offset({ y: this.STATUS_card_expanding != -1 ? 0 : 50 })
-                    .animation(this.DESIGN_animateParam(600))
                     .fontSize(22)
                     .maxLines(1)
                     .fontColor(this.DESIGN_font_color)
@@ -1377,6 +1408,9 @@ struct Index {
 
                 }.alignItems(HorizontalAlign.Start).height("100%").width("100%")
               }.width("100%").height(400)
+              .offset({ y: (this.DETAILS_is_not_viewing_detail()) ? 100 : 0 })
+              .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
+              .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 700))
 
               // MANAGING
 
@@ -1680,12 +1714,12 @@ struct Index {
     this.DATA_cards_punch_card.splice(to, 0, temp)
   }
 
-  CARD_collapse_card_detail(scroll_main: boolean, scroll_detail: boolean) {
+  CARD_collapse_card_detail(scroll_home: boolean, scroll_detail: boolean) {
     this.STATUS_card_expanding = -1
     if (scroll_detail) {
       this.scroller_card_expand.scrollTo({ xOffset: 0, yOffset: 0 })
     }
-    if (scroll_main) {
+    if (scroll_home) {
       this.scroller_main.scrollToIndex(this.STATUS_card_index_of_last_expanded + 3, true)
     }
   }
@@ -1696,9 +1730,11 @@ struct Index {
     if (target == 1001) {
       return 500
     }
-    if (done > target) { // if over kill
+    if (done > target) {
+      // if over kill
       return target
-    } else { // if not done
+    } else {
+      // if not done
       return done
     }
   }
@@ -1730,7 +1766,7 @@ struct Index {
     return ((end - now) / 864000 / limit).toFixed(2) + " %"
   }
 
-  CARD_get_average_daily_work_left_processed() {
+  CARD_get_average_daily_work_left_processed_for_display() {
     let target = this.DATA_cards_target[this.STATUS_card_index_of_last_expanded]
     let done = this.DATA_cards_done[this.STATUS_card_index_of_last_expanded]
     let limit = this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded]
@@ -1760,6 +1796,24 @@ struct Index {
 
     return target / limit
     // Regular situations
+  }
+
+  CARD_get_today_block_index() {
+    if (this.DATA_cards_punch_card[this.STATUS_card_index_of_last_expanded] == undefined) {
+      return 0
+    }
+
+    let last_of_punch_card = this.DATA_cards_punch_card[this.STATUS_card_index_of_last_expanded].length - 1
+    let card_start_stamp = this.DATA_cards_start[this.STATUS_card_index_of_last_expanded]
+    let time_passed_from_card_start = this.UTIL_get_relative_time_passed(card_start_stamp, systemDateTime.getTime())
+
+    return Math.min(time_passed_from_card_start, last_of_punch_card)
+  }
+
+  CARD_get_date_of_chosen() {
+    let card_start_stamp = this.DATA_cards_start[this.STATUS_card_index_of_last_expanded]
+    let date_chosen_stamp = card_start_stamp + this.UI_card_expanded_viewing_detail_of_block_index * 24 * 3600 * 1000
+    return this.UTIL_get_connected_date(date_chosen_stamp) as string[]
   }
 
   CARD_storeCards() {
@@ -1792,7 +1846,7 @@ struct Index {
     } else {
       let time_length = (systemDateTime.getTime() - this.DATA_work_start) / 1000 / 3600
       this.DATA_cards_done[this.DATA_cards_name.indexOf(this.DATA_work_working_card_name)] += time_length
-      this.WORK_punch_card_add(this.DATA_work_working_card_name, time_length)
+      this.WORK_punch_punch_card(this.DATA_work_working_card_name, time_length)
       this.DATA_work_working_card_name = ""
       this.DATA_work_start = 0
       this.DATA_work_last_end = systemDateTime.getTime()
@@ -1819,11 +1873,10 @@ struct Index {
     return punch_card
   }
 
-  WORK_punch_card_add(name: string, record: number) {
+  WORK_punch_punch_card(name: string, record: number) {
     let index = this.DATA_cards_name.indexOf(name)
     let time_start = this.DATA_cards_start[index]
     let today_index = this.UTIL_get_relative_time_passed(time_start, systemDateTime.getTime())
-
     if (index == -1) {
       // Error of an nonexistent work
       console.log("Punch: failed due to an nonexistent work")
@@ -1894,6 +1947,14 @@ struct Index {
       output.push(line_of_number)
     }
     return output
+  }
+
+  UTIL_get_connected_date(timestamp: number) {
+    let date = new Date(timestamp)
+    let connected: string[] = ["date", "day"]
+    connected[0] = date.getFullYear() + "／" + (date.getMonth() + 1) + "／" + date.getDate()
+    connected[1] = date.getDay().toString()
+    return connected
   }
 }
 
@@ -2168,72 +2229,107 @@ struct LinysTextArea {
 }
 
 @Component
-struct LinysDataBlocks {
+struct LinysDataBoard {
   @Prop DATA_list_of_data: number[] = []
-  @Prop DATA_Reference_value: number = 1
+  @Prop DATA_reference_value: number = 1
   @Prop DATA_first_day_stamp: number = 0
+  @Prop DATA_today_index: number = 0
   @Prop DESIGN_block_color: string = "#FFFFFF"
+  @Prop DESIGN_button_text_color: string = "#000000"
   @Prop ENVIRONMENT_screen_width: number
   @Prop STATUS_current_expand: number
+  @Link UI_chosen_block_index: number
+  grid_scroller: Scroller = new Scroller()
 
   build() {
-    Row() {
-      Text($r("app.string.UI_Days_In_A_Week"))
-        .height('100%')
-        .lineHeight(29)
-        .margin({ right: 10 })
-        .textAlign(TextAlign.End)
-        .fontWeight(FontWeight.Medium)
-        .fontColor(this.DESIGN_block_color)
+    Column() {
+      Row() {
+        Text($r("app.string.UI_Days_In_A_Week"))
+          .height('100%')
+          .lineHeight(29)
+          .margin({ right: 10 })
+          .textAlign(TextAlign.End)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.DESIGN_block_color)
 
-      Grid() {
-        ForEach(this.DATA_days_bias_list(), (_content: string, key: number) => {
-          GridItem() {
-            Text()// key.toString()
-              .width('100%')
-              .height('100%')
-              .textAlign(TextAlign.Center)
-              .backgroundColor(this.DESIGN_block_color)
-              .opacity(this.DESIGN_opacity_of_value(0, 1))
-          }
-          .width(26)
-          .onClick(() => {
+        Grid(this.grid_scroller) {
+          ForEach(this.DATA_days_bias_list(), (_content: string, _key: number) => {
+            GridItem() {
+              Text()
+                .width('100%')
+                .height('100%')
+                .opacity(0)
+            }
+            .width(26)
+            .onClick(() => {
+            })
+
+            // Fill at the front so that the Blocks always start from Sunday
           })
 
-          // Fill at the front so that the Blocks always start from Sunday
-        })
-
-        ForEach(this.STATUS_current_expand == -1 ? [] : this.DATA_list_of_data, (_content: string, key: number) => {
-          GridItem() {
-            Text()// key.toString()
-              .width('100%')
-              .height('100%')
-              .textAlign(TextAlign.Center)
-              .backgroundColor(this.DESIGN_block_color)
-              .opacity(
-                this.DESIGN_opacity_of_value(this.DATA_list_of_data == null ? 1 : this.DATA_list_of_data[key],
-                  this.DATA_Reference_value)
-              )
-          }
-          .width(26)
-          .onClick(() => {
+          ForEach(this.STATUS_current_expand == -1 ? [] : this.DATA_list_of_data, (_content: string, key: number) => {
+            GridItem() {
+              Text()// key.toString()
+                .width('100%')
+                .height('100%')
+                .textAlign(TextAlign.Center)
+                .backgroundColor(this.DESIGN_block_color)
+                .opacity(
+                  this.DESIGN_opacity_of_value(key)
+                )
+                .borderRadius(key == this.UI_chosen_block_index ? 4 : 6)
+            }
+            .borderRadius(6)
+            .border({
+              color: this.DESIGN_block_color,
+              width: key == this.UI_chosen_block_index ? 2 : 0
+            })
+            .width(26)
+            .onClick(() => {
+              this.UI_chosen_block_index = key
+            })
+            .clickEffect({ level: ClickEffectLevel.LIGHT })
           })
+        }
+        .edgeEffect(EdgeEffect.Spring)
+        .alignRules({
+          top: { anchor: "__container__", align: VerticalAlign.Top },
+          left: { anchor: "__container__", align: HorizontalAlign.Start }
         })
+        .rowsTemplate("1fr 1fr 1fr 1fr 1fr 1fr 1fr")
+        .columnsGap(3)
+        .rowsGap(3)
+        .height(200)
+        .layoutWeight(1)
       }
-      .edgeEffect(EdgeEffect.Spring)
-      .alignRules({
-        top: { anchor: "__container__", align: VerticalAlign.Top },
-        left: { anchor: "__container__", align: HorizontalAlign.Start }
-      })
-      .rowsTemplate("1fr 1fr 1fr 1fr 1fr 1fr 1fr")
-      .columnsGap(3)
-      .rowsGap(3)
       .height(200)
-      .layoutWeight(1)
+      .margin({ bottom: 15 })
+
+      Button() {
+        Text($r("app.string.Data_Board_Jump_To_Today"))
+          .fontSize(15)
+          .fontColor(this.DESIGN_button_text_color)
+          .fontWeight(FontWeight.Bolder)
+      }
+      .width("100%")
+      .padding(5)
+      .backgroundColor(this.DESIGN_block_color)
+      .clickEffect({ level: ClickEffectLevel.LIGHT })
+      .onClick(() => {
+        if (this.DATA_today_index >= 0) {
+          this.UI_chosen_block_index = this.DATA_today_index
+          this.grid_scroller.scrollToIndex(this.DATA_today_index, true)
+        } else {
+          console.log("DATA BOARD: SCROLL TO TODAY FAILED DUE TO TIME REVERSION (what?")
+        }
+      })
     }
   }
 
-  DESIGN_opacity_of_value(value: number, reference: number) {
+  DESIGN_opacity_of_value(key: number) {
+
+    let value = this.DATA_list_of_data == null ? 1 : this.DATA_list_of_data[key]
+    let reference = this.DATA_reference_value
     let done_rate = Math.min(value / reference, 1)
     if (done_rate < 0.1) {
       return 0.1
