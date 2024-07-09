@@ -251,6 +251,10 @@
     {
       "name": "Work_Start_Other_Ongoing",
       "value": "Task Ongoing \uDB80\uDC2B"
+    },
+    {
+      "name": "UI_Days_In_A_Week",
+      "value": "Sun\nMon\nTue\nWed\nThu\nFri\nSat"
     }
   ]
 

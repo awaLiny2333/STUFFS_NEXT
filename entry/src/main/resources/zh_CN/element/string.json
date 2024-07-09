@@ -251,6 +251,10 @@
     {
       "name": "Work_Start_Other_Ongoing",
       "value": "已经在进行中 \uDB80\uDC2B"
+    },
+    {
+      "name": "UI_Days_In_A_Week",
+      "value": "日\n一\n二\n三\n四\n五\n六"
     }
   ]
 }
