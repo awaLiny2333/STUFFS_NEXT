@@ -91,10 +91,10 @@ struct Index {
   scroller_main: Scroller = new Scroller()
 
   onPageShow() {
-    console.log("OKK")
+    console.log("onPageShow")
     PreferencesTools.getValueOfKey("meow").then((result) => {
       if (result == "no") {
-        console.log("welcome first run") // First open app then put
+        console.log("onPageShow: Welcome first run") // First open app then put
         PreferencesTools.putValueOfKey("meow", "meow")
         KVManagerTools.putValueOfKey("use_backdrop", "false")
         KVManagerTools.putValueOfKey("color_scheme_light", this.DESIGN_color_scheme_light_default)
@@ -114,7 +114,7 @@ struct Index {
           if (this.DATA_cards_name[0] == "") {
             this.DATA_cards_name = []
           }
-          console.log("Card_name: " + this.DATA_cards_name.toString())
+          console.log("onPageShow: Card_name: " + this.DATA_cards_name.toString())
         })
         KVManagerTools.getValueOfKey("cards_desc").then((result) => {
           this.DATA_cards_desc = (result as string).split(",")
@@ -124,17 +124,19 @@ struct Index {
         })
         KVManagerTools.getValueOfKey("cards_length").then((result) => {
           temp = (result as string).split(",")
-          console.log("Cards_length_raw: " + result)
+          console.log("onPageShow: Cards_length_raw: " + result)
+          this.DATA_cards_length = []
           for (let index = 0; index < temp.length; index++) {
             this.DATA_cards_length.push(Number(temp[index]))
           }
           if (temp[0] == "") {
             this.DATA_cards_length = []
           }
-          console.log("Cards_length: " + this.DATA_cards_length.toString())
+          console.log("onPageShow: Cards_length: " + this.DATA_cards_length.toString())
         })
         KVManagerTools.getValueOfKey("cards_time_limit").then((result) => {
           temp = (result as string).split(",")
+          this.DATA_cards_time_limit = []
           for (let index = 0; index < temp.length; index++) {
             this.DATA_cards_time_limit.push(Number(temp[index]))
           }
@@ -144,7 +146,8 @@ struct Index {
         })
         KVManagerTools.getValueOfKey("cards_target").then((result) => {
           temp = (result as string).split(",")
-          console.log("Cards_target: " + temp.toString())
+          console.log("onPageShow: Cards_target: " + temp.toString())
+          this.DATA_cards_target = []
           for (let index = 0; index < temp.length; index++) {
             this.DATA_cards_target.push(Number(temp[index]))
           }
@@ -163,6 +166,7 @@ struct Index {
         })
         KVManagerTools.getValueOfKey("cards_start").then((result) => {
           temp = (result as string).split(",")
+          this.DATA_cards_start = []
           for (let index = 0; index < temp.length; index++) {
             this.DATA_cards_start.push(Number(temp[index]))
           }
@@ -172,6 +176,7 @@ struct Index {
         })
         KVManagerTools.getValueOfKey("cards_end").then((result) => {
           temp = (result as string).split(",")
+          this.DATA_cards_end = []
           for (let index = 0; index < temp.length; index++) {
             this.DATA_cards_end.push(Number(temp[index]))
           }
@@ -180,7 +185,7 @@ struct Index {
           }
         })
         KVManagerTools.getValueOfKey("cards_punch_card").then((result) => {
-          console.log("Cards_punch_card: " + result as string)
+          console.log("onPageShow: Cards_punch_card: " + result as string)
           this.DATA_cards_punch_card = this.UTIL_string_to_number_mat(result as string)
         })
         KVManagerTools.getValueOfKey("DATA_work_working_card_name").then((result) => {
@@ -200,7 +205,7 @@ struct Index {
 
   onBackPress(): boolean | void {
     if (this.STATUS_card_expanding != -1) {
-      this.STATUS_card_expanding = -1
+      this.CARD_collapse_card_detail(false, true)
       return true
     }
   }
@@ -1109,7 +1114,7 @@ struct Index {
                   Text($r("app.string.Card_Progress_Desc_Estimating")).fontSize(16).fontColor(this.DESIGN_font_color)
 
                   Row() {
-                    Text(this.CARD_get_next_every_day_work())
+                    Text(this.CARD_get_average_daily_work_left_processed())
                       .fontSize(40)
                       .fontColor(this.DESIGN_font_color)
                       .fontWeight(FontWeight.Bold)
@@ -1159,6 +1164,25 @@ struct Index {
               }.width("100%").height(this.DETAILS_is_wide_screen() ? 270 : 240)
 
               // EXPLANATION
+
+              FlowItem() {
+                LinysDataBlocks({
+                  DATA_list_of_data: this.DATA_cards_punch_card[this.STATUS_card_index_of_last_expanded],
+                  DESIGN_block_color: this.DESIGN_font_color,
+                  DATA_Reference_value: this.CARD_get_average_daily_work(),
+                  ENVIRONMENT_screen_width: this.ENVIRONMENT_screen_width,
+                  DATA_first_day_stamp: this.DATA_cards_start[this.STATUS_card_index_of_last_expanded],
+                  STATUS_current_expand: this.STATUS_card_expanding
+                })
+                  .offset({ y: (this.DETAILS_is_not_viewing_detail()) ? 100 : 0 })
+                  .visibility((this.DETAILS_is_not_viewing_detail()) ? Visibility.Hidden : Visibility.Visible)
+                  .animation(this.DESIGN_animateParam(this.DETAILS_is_not_viewing_detail() ? 0 : 550))
+              }.width("100%").height(220)
+
+              FlowItem() {
+              }.width("1005").height(this.DETAILS_is_wide_screen() ? 220 : 0)
+
+              // DATA BOARD
 
               FlowItem() {
                 Column({ space: 10 }) {
@@ -1249,10 +1273,10 @@ struct Index {
                   .width("100%")
                   .padding(5)
                   .backgroundColor(this.DESIGN_font_color)
-                  .onClick(() => { // Save Card and Add
+                  .onClick(() => { // Save Card
                     this.DATA_cards_name[this.STATUS_card_index_of_last_expanded] = this.EDIT_name
                     if (this.EDIT_description == "") {
-                      console.log("empty desc")
+                      console.log("Edit Card: empty desc, replacing with default '喵 meow'")
                       this.DATA_cards_desc[this.STATUS_card_index_of_last_expanded] = "喵 meow"
                     } else {
                       this.DATA_cards_desc[this.STATUS_card_index_of_last_expanded] = this.EDIT_description
@@ -1339,10 +1363,11 @@ struct Index {
                       this.DATA_cards_done.splice(this.STATUS_card_expanding, 1)
                       this.DATA_cards_start.splice(this.STATUS_card_expanding, 1)
                       this.DATA_cards_end.splice(this.STATUS_card_expanding, 1)
+                      this.DATA_cards_punch_card.splice(this.STATUS_card_expanding, 1)
 
                       this.scroller_card_expand.scrollTo({ xOffset: 0, yOffset: 0 })
+                      this.STATUS_card_index_of_last_expanded = this.STATUS_card_expanding - 1
                       this.STATUS_card_expanding = -1
-                      this.STATUS_card_index_of_last_expanded = -1
 
                       this.CARD_storeCards()
                     }
@@ -1392,9 +1417,6 @@ struct Index {
         })
         .width("100%")
         .height("100%")
-        .onClick(() => {
-          this.CARD_collapse_card_detail(false, true) // CLICK PANEL => CLOSE
-        })
         .edgeEffect(EdgeEffect.Spring)
 
         // CARD POP UP
@@ -1524,8 +1546,8 @@ struct Index {
   }
 
   DESIGN_store_current_design() {
-    console.log(this.DESIGN_color_scheme_light.toString() + ' light_qwq')
-    console.log(this.DESIGN_color_scheme_dark.toString() + ' dark_qwq')
+    console.log("DESIGN_store_current_design" + this.DESIGN_color_scheme_light.toString() + ' light_qwq')
+    console.log("DESIGN_store_current_design" + this.DESIGN_color_scheme_dark.toString() + ' dark_qwq')
     KVManagerTools.putValueOfKey("color_scheme_light", this.DESIGN_color_scheme_light.toString())
     KVManagerTools.putValueOfKey("color_scheme_dark", this.DESIGN_color_scheme_dark.toString())
     KVManagerTools.putValueOfKey("blur_radius", this.DESIGN_cards_blur_radius.toString())
@@ -1584,7 +1606,7 @@ struct Index {
 
     this.DATA_cards_name.push(this.ADD_name)
     if (this.ADD_description == "") {
-      console.log("empty desc")
+      console.log("Add Card: empty desc, replacing with default '喵 meow'")
       this.DATA_cards_desc.push("喵 meow")
     } else {
       this.DATA_cards_desc.push(this.ADD_description)
@@ -1685,23 +1707,30 @@ struct Index {
     let target = this.DATA_cards_target[this.STATUS_card_index_of_last_expanded]
     let done = this.DATA_cards_done[this.STATUS_card_index_of_last_expanded]
     if (target == 1001) {
+      // Unlimited Target
       return "50 %"
-    } else {
-      return (done / target * 100).toFixed(2) + " %"
     }
+    // Normal Cases
+    return (done / target * 100).toFixed(2) + " %"
   }
 
   CARD_get_time_left_percentage() {
     let limit = this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded]
     let end = this.DATA_cards_end[this.STATUS_card_index_of_last_expanded]
+    let now = systemDateTime.getTime()
     if (limit == 367) {
-      return "50%"
-    } else {
-      return ((end - systemDateTime.getTime()) / 864000 / limit).toFixed(2) + " %"
+      // Unlimited time
+      return "50 %"
     }
+    if ((end - now) / 864000 / limit < 0) {
+      // Already finished
+      return "0 %"
+    }
+    // Normal cases
+    return ((end - now) / 864000 / limit).toFixed(2) + " %"
   }
 
-  CARD_get_next_every_day_work() {
+  CARD_get_average_daily_work_left_processed() {
     let target = this.DATA_cards_target[this.STATUS_card_index_of_last_expanded]
     let done = this.DATA_cards_done[this.STATUS_card_index_of_last_expanded]
     let limit = this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded]
@@ -1709,13 +1738,28 @@ struct Index {
     if (done > target) { // Already finished
       return "( •̀ ω •́ )✧"
     }
-    if (this.UI_card_expanded_remaining_days == 0) { // Already over due
+    if (this.UI_card_expanded_remaining_days == 0) {
+      // Already over due
       return "1"
     }
-    if (limit == 367 || target == 1001) { // Infinite goal
+    if (limit == 367 || target == 1001) {
+      // Infinite goal
       return " ∞ "
-    } // Regular situations
+    }
+    // Normal Cases
     return ((target - done) / this.UI_card_expanded_remaining_days).toFixed(4)
+  }
+
+  CARD_get_average_daily_work() {
+    let target = this.DATA_cards_target[this.STATUS_card_index_of_last_expanded]
+    let limit = this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded]
+
+    if (limit == 367 || target == 1001) { // Infinite goal
+      return 1
+    }
+
+    return target / limit
+    // Regular situations
   }
 
   CARD_storeCards() {
@@ -1738,13 +1782,13 @@ struct Index {
       this.VIEW_move_card_to_index(this.STATUS_card_expanding, 0)
       this.CARD_storeCards()
     } else {
-      console.log("Cannot Start Card Since There Already Exists an Ongoing Card")
+      console.log("WORK_start_card: Cannot Start Card Since There Already Exists an Ongoing Card")
     }
   }
 
   WORK_end_card() {
     if (this.WORK_is_work_on_idle()) {
-      console.log("Cannot End Card Since NO Card is Ongoing") // Is currently not working
+      console.log("WORK_end_card: Cannot End Card Since NO Card is Ongoing") // Is currently not working
     } else {
       let time_length = (systemDateTime.getTime() - this.DATA_work_start) / 1000 / 3600
       this.DATA_cards_done[this.DATA_cards_name.indexOf(this.DATA_work_working_card_name)] += time_length
@@ -1819,6 +1863,10 @@ struct Index {
   }
 
   UTIL_string_to_string_mat(input: string) {
+    if (input == "") {
+      return []
+    }
+
     let rows = input.split(";")
     let output: string[][] = []
     for (let index = 0; index < rows.length; index++) {
@@ -1828,6 +1876,10 @@ struct Index {
   }
 
   UTIL_string_to_number_mat(input: string) {
+    if (input == "") {
+      return []
+    }
+
     let rows = input.split(";")
     let output: number[][] = []
     let line: string[] = []
@@ -2112,5 +2164,98 @@ struct LinysTextArea {
   animateParam(delay: number) {
     let ap: AnimateParam = { delay: delay, duration: 300, curve: Curve.ExtremeDeceleration }
     return ap
+  }
+}
+
+@Component
+struct LinysDataBlocks {
+  @Prop DATA_list_of_data: number[] = []
+  @Prop DATA_Reference_value: number = 1
+  @Prop DATA_first_day_stamp: number = 0
+  @Prop DESIGN_block_color: string = "#FFFFFF"
+  @Prop ENVIRONMENT_screen_width: number
+  @Prop STATUS_current_expand: number
+
+  build() {
+    Row() {
+      Text($r("app.string.UI_Days_In_A_Week"))
+        .height('100%')
+        .lineHeight(29)
+        .margin({ right: 10 })
+        .textAlign(TextAlign.End)
+        .fontWeight(FontWeight.Medium)
+        .fontColor(this.DESIGN_block_color)
+
+      Grid() {
+        ForEach(this.DATA_days_bias_list(), (_content: string, key: number) => {
+          GridItem() {
+            Text()// key.toString()
+              .width('100%')
+              .height('100%')
+              .textAlign(TextAlign.Center)
+              .backgroundColor(this.DESIGN_block_color)
+              .opacity(this.DESIGN_opacity_of_value(0, 1))
+          }
+          .width(26)
+          .onClick(() => {
+          })
+
+          // Fill at the front so that the Blocks always start from Sunday
+        })
+
+        ForEach(this.STATUS_current_expand == -1 ? [] : this.DATA_list_of_data, (_content: string, key: number) => {
+          GridItem() {
+            Text()// key.toString()
+              .width('100%')
+              .height('100%')
+              .textAlign(TextAlign.Center)
+              .backgroundColor(this.DESIGN_block_color)
+              .opacity(
+                this.DESIGN_opacity_of_value(this.DATA_list_of_data == null ? 1 : this.DATA_list_of_data[key],
+                  this.DATA_Reference_value)
+              )
+          }
+          .width(26)
+          .onClick(() => {
+          })
+        })
+      }
+      .edgeEffect(EdgeEffect.Spring)
+      .alignRules({
+        top: { anchor: "__container__", align: VerticalAlign.Top },
+        left: { anchor: "__container__", align: HorizontalAlign.Start }
+      })
+      .rowsTemplate("1fr 1fr 1fr 1fr 1fr 1fr 1fr")
+      .columnsGap(3)
+      .rowsGap(3)
+      .height(200)
+      .layoutWeight(1)
+    }
+  }
+
+  DESIGN_opacity_of_value(value: number, reference: number) {
+    let done_rate = Math.min(value / reference, 1)
+    if (done_rate < 0.1) {
+      return 0.1
+    }
+    if (done_rate < 0.3) {
+      return 0.3
+    }
+    if (done_rate < 0.6) {
+      return 0.6
+    }
+    if (done_rate < 0.8) {
+      return 0.8
+    }
+    return done_rate
+  }
+
+  DATA_days_bias_list() {
+    let first_day = new Date(this.DATA_first_day_stamp).getDay()
+    let empty_list: number[] = []
+    for (let index = 0; index < first_day; index++) {
+      empty_list.push(0)
+    }
+    return empty_list
   }
 }
