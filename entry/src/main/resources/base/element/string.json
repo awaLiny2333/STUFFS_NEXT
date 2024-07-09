@@ -255,6 +255,18 @@
     {
       "name": "UI_Days_In_A_Week",
       "value": "日\n一\n二\n三\n四\n五\n六"
+    },
+    {
+      "name": "Data_Board_Jump_To_Today",
+      "value": "找到今天 \uDB80\uDFD8"
+    },
+    {
+      "name": "Data_Board_Submitted",
+      "value": "在这天提交了"
+    },
+    {
+      "name": "Data_Board_Submitted_Hours_Of_Work",
+      "value": "小时记录！"
     }
   ]
 }

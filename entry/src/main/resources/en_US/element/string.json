@@ -254,7 +254,19 @@
     },
     {
       "name": "UI_Days_In_A_Week",
-      "value": "Sun\nMon\nTue\nWed\nThu\nFri\nSat"
+      "value": "Ｓ\nＭ\nＴ\nＷ\nＴ\nＦ\nＳ"
+    },
+    {
+      "name": "Data_Board_Jump_To_Today",
+      "value": "Jump To Today \uDB80\uDFD8"
+    },
+    {
+      "name": "Data_Board_Submitted",
+      "value": "Submitted"
+    },
+    {
+      "name": "Data_Board_Submitted_Hours_Of_Work",
+      "value": "Hours of Work"
     }
   ]
 
