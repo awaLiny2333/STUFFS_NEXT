@@ -2,8 +2,8 @@
   "app": {
     "bundleName": "com.next.liny.linys1stnext",
     "vendor": "awa_Liny",
-    "versionCode": 1000007,
-    "versionName": "0.2.1",
+    "versionCode": 1000008,
+    "versionName": "0.2.2",
     "icon": "$media:app_icon",
     "label": "$string:app_name"
   }
