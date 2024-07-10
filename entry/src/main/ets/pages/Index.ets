@@ -13,6 +13,7 @@ struct Index {
   @State ENVIRONMENT_screen_height: number = display.getDefaultDisplaySync().height
   @StorageProp('currentColorMode') @Watch('onColorModeChange') ENVIRONMENT_current_color_mode: number = 0
   @StorageProp('currentDirection') @Watch('onDirectionChange') ENVIRONMENT_current_direction: number = 1
+  @State ENVIRONMENT_current_timestamp: number = systemDateTime.getTime()
   @State STATUS_top_card_settings_is_open: boolean = false
   @State STATUS_top_card_add_is_open: boolean = false
   @State STATUS_current_time_period: string = "Morning"
@@ -90,6 +91,13 @@ struct Index {
   @State DATA_work_last_end: number = systemDateTime.getTime()
   scroller_card_expand: Scroller = new Scroller()
   scroller_main: Scroller = new Scroller()
+
+  aboutToAppear(): void {
+    console.log("Timer: Start!")
+    setInterval(() => {
+      this.UTIL_refresh_current_time_stamp()
+    }, 1000);
+  }
 
   onPageShow() {
     console.log("onPageShow")
@@ -797,8 +805,8 @@ struct Index {
                   .fontColor(this.DESIGN_font_color)
                   .width("100%")
                 Text(this.WORK_is_work_on_idle() ?
-                ((systemDateTime.getTime() - this.DATA_work_last_end) / 1000 / 3600).toFixed(2).toString() :
-                ((systemDateTime.getTime() - this.DATA_work_start) / 1000 / 3600).toFixed(2).toString())
+                ((this.ENVIRONMENT_current_timestamp - this.DATA_work_last_end) / 1000 / 3600).toFixed(2).toString() :
+                ((this.ENVIRONMENT_current_timestamp - this.DATA_work_start) / 1000 / 3600).toFixed(2).toString())
                   .maxLines(1)
                   .fontSize(60)
                   .fontWeight(FontWeight.Bold)
@@ -855,12 +863,13 @@ struct Index {
           ForEach(this.DATA_cards_name, (_content: string, key: number) => {
             LinysBlock({
               ENVIRONMENT_waterFlow_column_count: this.UI_waterFlow_Columns,
+              ENVIRONMENT_current_timestamp: this.ENVIRONMENT_current_timestamp,
+              ENVIRONMENT_screen_width: this.ENVIRONMENT_screen_width,
+              ENVIRONMENT_screen_height: this.ENVIRONMENT_screen_height,
               DESIGN_use_backdrop: this.DESIGN_use_backdrop,
               DESIGN_color_scheme: this.DESIGN_color_scheme,
               DESIGN_blur_radius: this.DESIGN_cards_blur_radius,
               DESIGN_font_color: this.DESIGN_font_color,
-              ENVIRONMENT_screen_width: this.ENVIRONMENT_screen_width,
-              ENVIRONMENT_screen_height: this.ENVIRONMENT_screen_height,
               STATUS_card_expanding: this.STATUS_card_expanding,
               STATUS_last_expanded: this.STATUS_card_index_of_last_expanded,
               DETAILS_remaining_days: this.UI_card_expanded_remaining_days,
@@ -1175,7 +1184,7 @@ struct Index {
                   DATA_first_day_stamp: this.DATA_cards_start[this.STATUS_card_index_of_last_expanded],
                   DATA_today_index:
                   this.UTIL_get_relative_days_passed(
-                    this.DATA_cards_start[this.STATUS_card_index_of_last_expanded], systemDateTime.getTime()
+                    this.DATA_cards_start[this.STATUS_card_index_of_last_expanded], this.ENVIRONMENT_current_timestamp
                   ),
                   STATUS_current_expand: this.STATUS_card_expanding,
                   ENVIRONMENT_screen_width: this.ENVIRONMENT_screen_width,
@@ -1649,8 +1658,8 @@ struct Index {
     this.DATA_cards_time_limit.push(this.ADD_time_limit)
     this.DATA_cards_target.push(this.ADD_value_target)
     this.DATA_cards_done.push(0)
-    this.DATA_cards_start.push(systemDateTime.getTime())
-    this.DATA_cards_end.push(systemDateTime.getTime() + 86400000 * this.ADD_time_limit)
+    this.DATA_cards_start.push(this.ENVIRONMENT_current_timestamp)
+    this.DATA_cards_end.push(this.ENVIRONMENT_current_timestamp + 86400000 * this.ADD_time_limit)
     this.DATA_cards_punch_card.push(this.WORK_create_punch_card(this.ADD_time_limit))
     this.CARD_storeCards()
 
@@ -1661,7 +1670,7 @@ struct Index {
     this.STATUS_top_card_add_is_open = false
     // Collapse Add Card Panel
 
-    this.scroller_main.scrollToIndex(this.DATA_cards_name.length - 2, true)
+    this.scroller_main.scrollToIndex(this.DATA_cards_name.length - 1, true)
 
     return true
 
@@ -1759,7 +1768,7 @@ struct Index {
   CARD_get_time_left_percentage() {
     let limit = this.DATA_cards_time_limit[this.STATUS_card_index_of_last_expanded]
     let end = this.DATA_cards_end[this.STATUS_card_index_of_last_expanded]
-    let now = systemDateTime.getTime()
+    let now = this.ENVIRONMENT_current_timestamp
     if (limit == 367) {
       // Unlimited time
       return "50 %"
@@ -1811,7 +1820,7 @@ struct Index {
 
     let last_of_punch_card = this.DATA_cards_punch_card[this.STATUS_card_index_of_last_expanded].length - 1
     let card_start_stamp = this.DATA_cards_start[this.STATUS_card_index_of_last_expanded]
-    let time_passed_from_card_start = this.UTIL_get_relative_days_passed(card_start_stamp, systemDateTime.getTime())
+    let time_passed_from_card_start = this.UTIL_get_relative_days_passed(card_start_stamp, this.ENVIRONMENT_current_timestamp)
 
     return Math.min(time_passed_from_card_start, last_of_punch_card)
   }
@@ -1837,7 +1846,7 @@ struct Index {
   WORK_start_card(name: string) {
     if (this.WORK_is_work_on_idle()) {
       this.DATA_work_working_card_name = name
-      this.DATA_work_start = systemDateTime.getTime()
+      this.DATA_work_start = this.ENVIRONMENT_current_timestamp
       this.WORK_storeWorkingState()
       this.VIEW_move_card_to_index(this.STATUS_card_expanding, 0)
       this.CARD_storeCards()
@@ -1850,12 +1859,12 @@ struct Index {
     if (this.WORK_is_work_on_idle()) {
       console.log("WORK_end_card: Cannot End Card Since NO Card is Ongoing") // Is currently not working
     } else {
-      let time_length = (systemDateTime.getTime() - this.DATA_work_start) / 1000 / 3600
+      let time_length = (this.ENVIRONMENT_current_timestamp - this.DATA_work_start) / 1000 / 3600
       this.DATA_cards_done[this.DATA_cards_name.indexOf(this.DATA_work_working_card_name)] += time_length
       this.WORK_punch_punch_card(this.DATA_work_working_card_name, time_length)
       this.DATA_work_working_card_name = ""
       this.DATA_work_start = 0
-      this.DATA_work_last_end = systemDateTime.getTime()
+      this.DATA_work_last_end = this.ENVIRONMENT_current_timestamp
       this.WORK_storeWorkingState()
       this.CARD_storeCards() // End Card Work
     }
@@ -1882,7 +1891,7 @@ struct Index {
   WORK_punch_punch_card(name: string, record: number) {
     let index = this.DATA_cards_name.indexOf(name)
     let time_start = this.DATA_cards_start[index]
-    let today_index = this.UTIL_get_relative_days_passed(time_start, systemDateTime.getTime())
+    let today_index = this.UTIL_get_relative_days_passed(time_start, this.ENVIRONMENT_current_timestamp)
     if (index == -1) {
       // Error of an nonexistent work
       console.log("Punch: failed due to an nonexistent work")
@@ -1962,12 +1971,17 @@ struct Index {
     connected[1] = date.getDay().toString()
     return connected
   }
+
+  UTIL_refresh_current_time_stamp() {
+      this.ENVIRONMENT_current_timestamp = systemDateTime.getTime()
+  }
 }
 
 @Component
 struct LinysBlock {
   @Prop ENVIRONMENT_screen_width: number;
   @Prop ENVIRONMENT_screen_height: number;
+  @Prop ENVIRONMENT_current_timestamp: number;
   @State ENVIRONMENT_expanded_width: number = Math.min(500, this.ENVIRONMENT_screen_width - 40)
   @State ENVIRONMENT_waterFlow_column_count: number = 0
   @Link STATUS_card_expanding: number;
@@ -2103,7 +2117,7 @@ struct LinysBlock {
   }
 
   getRemainingDays() {
-    return Math.max(0, Number(((this.end - systemDateTime.getTime()) / 86400000).toFixed(4)))
+    return Math.max(0, Number(((this.end - this.ENVIRONMENT_current_timestamp) / 86400000).toFixed(4)))
   }
 
   setDetailsInfo() {
