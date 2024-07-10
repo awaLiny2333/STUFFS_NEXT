@@ -66,9 +66,9 @@ struct Index {
   @State ADD_description: string = ""
   @State ADD_length: number = 200
   @State ADD_length_description: string = "app.string.Add_Length_Notice_Short"
-  @State ADD_time_limit: number = 31
+  @State ADD_time_limit: number = 21
   @State ADD_time_limit_unit_or_description: string = "app.string.Add_Day"
-  @State ADD_value_target: number = 233
+  @State ADD_value_target: number = 12
   @State ADD_value_target_unit_or_description: string = "app.string.Add_Value_Unit_Hour"
   @State EDIT_name: string = ""
   @State EDIT_description: string = ""
@@ -1174,7 +1174,7 @@ struct Index {
                   DATA_reference_value: this.CARD_get_average_daily_work(),
                   DATA_first_day_stamp: this.DATA_cards_start[this.STATUS_card_index_of_last_expanded],
                   DATA_today_index:
-                  this.UTIL_get_relative_time_passed(
+                  this.UTIL_get_relative_days_passed(
                     this.DATA_cards_start[this.STATUS_card_index_of_last_expanded], systemDateTime.getTime()
                   ),
                   STATUS_current_expand: this.STATUS_card_expanding,
@@ -1657,6 +1657,12 @@ struct Index {
     this.ADD_name = ""
     this.ADD_description = ""
 
+    this.UI_top_card_height = 170
+    this.STATUS_top_card_add_is_open = false
+    // Collapse Add Card Panel
+
+    this.scroller_main.scrollToIndex(this.DATA_cards_name.length - 2, true)
+
     return true
 
   }
@@ -1805,7 +1811,7 @@ struct Index {
 
     let last_of_punch_card = this.DATA_cards_punch_card[this.STATUS_card_index_of_last_expanded].length - 1
     let card_start_stamp = this.DATA_cards_start[this.STATUS_card_index_of_last_expanded]
-    let time_passed_from_card_start = this.UTIL_get_relative_time_passed(card_start_stamp, systemDateTime.getTime())
+    let time_passed_from_card_start = this.UTIL_get_relative_days_passed(card_start_stamp, systemDateTime.getTime())
 
     return Math.min(time_passed_from_card_start, last_of_punch_card)
   }
@@ -1876,7 +1882,7 @@ struct Index {
   WORK_punch_punch_card(name: string, record: number) {
     let index = this.DATA_cards_name.indexOf(name)
     let time_start = this.DATA_cards_start[index]
-    let today_index = this.UTIL_get_relative_time_passed(time_start, systemDateTime.getTime())
+    let today_index = this.UTIL_get_relative_days_passed(time_start, systemDateTime.getTime())
     if (index == -1) {
       // Error of an nonexistent work
       console.log("Punch: failed due to an nonexistent work")
@@ -1898,8 +1904,8 @@ struct Index {
     return true
   }
 
-  UTIL_get_relative_time_passed(from: number, to: number) {
-    let days = Math.floor((to - from) / 1000 / 3600 / 24)
+  UTIL_get_relative_days_passed(from: number, to: number) {
+    let days = Math.floor((to) / 1000 / 3600 / 24 ) - Math.floor((from) / 3600 / 1000 / 24 )
     return days
   }
 
